@@ -35,13 +35,12 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-//    game_t game = {
-//        .board = { EMPTY, EMPTY, EMPTY,
-//                   EMPTY, EMPTY, EMPTY,
-//                   EMPTY, EMPTY, EMPTY },
-//        .player = PLAYER_X,
-//        .state = RUNNING_STATE
-//    };
+    game_t game = {
+        .selection = NO_SELECTION,
+        .state = GAME_OVER_STATE,
+        .question_number = 4
+    };
+
     int quit = 0;
     SDL_Event e;
     while (!quit /*game.state != QUIT_STATE*/) {
@@ -63,8 +62,7 @@ int main(int argc, char *argv[])
 
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL_RenderClear(renderer);
-        render_win_state(renderer);
-        //render_game(renderer, &game);
+        render_game(renderer, &game);
         SDL_RenderPresent(renderer);
     }
 

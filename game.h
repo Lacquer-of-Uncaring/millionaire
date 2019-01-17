@@ -6,7 +6,7 @@
 #define SCREEN_HEIGHT 480.0
 
 // Answer selction possiblities
-#define NO_SELCETION 0
+#define NO_SELECTION 0
 #define A_SELECTED 1
 #define B_SELECTED 2
 #define C_SELECTED 3
@@ -18,18 +18,17 @@
 
 // Gamestate
 #define RUNNING_STATE 0
-#define LOSE_STATE 1
-#define WIN_STATE 2
-#define QUIT_STATE 3
+#define GAME_OVER_STATE 1
+#define QUIT_STATE 2
 
 typedef struct {
 	// user* player; 
     // question questions[15]; 
     int selection;
     int state;
-    int le_50;
-    int le_25;
-    int q_switch;
+    // int le_50;
+    // int le_25;
+    // int q_switch;
     int question_number;
     // int timer;
 } game_t;
