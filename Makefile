@@ -35,16 +35,8 @@
 
 #.PHONY: all clean
 #OBJS specifies which files to compile as part of the project
-OBJS = 
 
-#CC specifies which compiler we're using
-CC = gcc
 
-#INCLUDE_PATHS specifies the additional include paths we'll need
-INCLUDE_PATHS = -IC:\mingw_dev_lib\include\SDL2
-
-#LIBRARY_PATHS specifies the additional library paths we'll need
-LIBRARY_PATHS = -LC:\mingw_dev_lib\lib
 
 #COMPILER_FLAGS specifies the additional compilation options we're using
 # -w suppresses all warnings
@@ -54,9 +46,28 @@ COMPILER_FLAGS = -w -Wl,-subsystem,windows
 #LINKER_FLAGS specifies the libraries we're linking against
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm -lSDL2
 
+
+OBJS = main.c rendering.o
+
+#CC specifies which compiler we're using
+CC = gcc
+
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = game.exe
 
+
 #This is the target that compiles our executable
 all : $(OBJS)
-	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+
+rendering.o : rendering.c rendering.h game.h
+	gcc -c rendering.c -o rendering.o 
+
+clean:
+	del rendering.o
+
+
+#recipe for rendering.o
+#rendering.o : rendering.c game.h rendering.h
+#	gcc -c rendering.c -o rendering.o 
+
