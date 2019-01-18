@@ -1,8 +1,10 @@
 # Plan
 
 ## Renderer (functions that render a given gamestate)
-//
 
+[x] Gameover state
+[ ] Running state
+[ ] Anwser checking state
 
 ## Logic (functions that change the gamestate)
 

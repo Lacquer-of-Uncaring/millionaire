@@ -36,18 +36,18 @@ int main(int argc, char *argv[])
     }
 
     game_t game = {
-        .selection = NO_SELECTION,
-        .state = GAME_OVER_STATE,
-        .question_number = 4
+        .selection = B_CONFIRMED,
+        .state = RUNNING_STATE,
+        .question_number = 15
     };
 
-    int quit = 0;
+
     SDL_Event e;
-    while (!quit /*game.state != QUIT_STATE*/) {
+    while (game.state != QUIT_STATE) {
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
             case SDL_QUIT:
-                quit = 1; //game.state = QUIT_STATE;
+                game.state = QUIT_STATE;
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
@@ -60,10 +60,11 @@ int main(int argc, char *argv[])
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         render_game(renderer, &game);
         SDL_RenderPresent(renderer);
+        SDL_Delay(1000/30);
     }
 
     SDL_DestroyWindow(window);

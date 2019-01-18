@@ -19,7 +19,8 @@
 // Gamestate
 #define RUNNING_STATE 0
 #define GAME_OVER_STATE 1
-#define QUIT_STATE 2
+#define CHECKING_STATE 2
+#define QUIT_STATE 3
 
 typedef struct {
 	// user* player; 

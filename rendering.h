@@ -1,6 +1,9 @@
 #ifndef RENDERING_H_
 #define RENDERING_H_
 
+#define INTRO_SCREEN "resources/intro.png"
+#define RUNNING_BG "resources/BG.png"
+
 #define H_SCREEN "resources/100.png"
 #define TWOH_SCREEN "resources/200.png"
 #define THREEH_SCREEN "resources/300.png"
@@ -19,9 +22,5 @@
 
 
 void render_game(SDL_Renderer *renderer, game_t *game);
-
-void render_win_state(SDL_Renderer *renderer);
-
-void render_lose_state(SDL_Renderer* renderer, game_t* game);
 
 #endif  // RENDERING_H_
