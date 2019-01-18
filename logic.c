@@ -1,5 +1,5 @@
-#include"game.h"
-#include"logic.h"
+#include "game.h"
+#include "logic.h"
 
 bool check_answer(game_t *game){
     int Q = game->question_number;

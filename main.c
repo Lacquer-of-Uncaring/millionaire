@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     }
 
     SDL_Window *window = SDL_CreateWindow("Millionaire",
-                                          100, 100,
+                                          700, 100,
                                           SCREEN_WIDTH, SCREEN_HEIGHT,
                                           SDL_WINDOW_SHOWN);
 
@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
         printf("error creating renderer: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
+
+
 
     game_t game = {
         .selection = B_CONFIRMED,
@@ -64,7 +66,8 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
         render_game(renderer, &game);
         SDL_RenderPresent(renderer);
-        SDL_Delay(1000/30);
+        SDL_Delay(1000/60);
+
     }
 
     SDL_DestroyWindow(window);
