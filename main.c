@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     game_t game = {
         .questions = {test,test,test,test,test,test,test,test,test,test,test,test,test,test,test},
         .selection = D_CONFIRMED,
-        .state = CHECKING_STATE,
+        .state = RUNNING_STATE,
         .question_number = 15
     };
 

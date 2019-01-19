@@ -286,5 +286,19 @@ void render_checking_state(SDL_Renderer* renderer, game_t* game){
 }
 
 void render_game(SDL_Renderer *renderer, game_t *game){
-    render_checking_state(renderer,game);
+    
+    switch(game->state){
+        case RUNNING_STATE:
+            render_running_state(renderer,game);
+            break;
+
+        case CHECKING_STATE:
+            render_checking_state(renderer,game);
+            break;
+
+        case GAME_OVER_STATE:
+            render_game_over_state(renderer,game);
+
+        default : {} 
+    }
 }
