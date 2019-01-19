@@ -5,6 +5,7 @@
 
 #include "game.h"
 #include "rendering.h"
+#include "logic.h"
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
@@ -42,9 +43,9 @@ int main(int argc, char *argv[])
 
     game_t game = {
         .questions = {test,test,test,test,test,test,test,test,test,test,test,test,test,test,test},
-        .selection = D_CONFIRMED,
+        .selection = NO_SELECTION,
         .state = RUNNING_STATE,
-        .question_number = 15
+        .question_number = 1
     };
 
 
@@ -55,7 +56,42 @@ int main(int argc, char *argv[])
             case SDL_QUIT:
                 game.state = QUIT_STATE;
                 break;
-
+            case SDL_KEYDOWN:
+                switch (e.key.keysym.scancode){
+                case SDL_SCANCODE_A:
+                    if (game.state == RUNNING_STATE){
+                        if (game.selection < 5)
+                            game.selection = A_SELECTED;
+                    }
+                    break;
+                case SDL_SCANCODE_B:
+                    if (game.state == RUNNING_STATE){
+                        if (game.selection < 5)
+                            game.selection = B_SELECTED;
+                    }
+                    break;
+                case SDL_SCANCODE_C:
+                    if (game.state == RUNNING_STATE){
+                        if (game.selection < 5)
+                            game.selection = C_SELECTED;
+                    }
+                    break;
+                case SDL_SCANCODE_D:
+                    if (game.state == RUNNING_STATE){
+                        if (game.selection < 5)
+                            game.selection = D_SELECTED;
+                    }
+                    break;
+                case SDL_SCANCODE_RETURN:
+                    answer_confirm(&game);
+                    break;
+                case SDL_SCANCODE_BACKSPACE:
+                    if (game.state == RUNNING_STATE)
+                        if (game.selection < 5)
+                            game.selection = NO_SELECTION;
+                    break;
+                }
+                break; 
             case SDL_MOUSEBUTTONDOWN:
                 //click_on_cell(&game,
                 //              e.button.y / CELL_HEIGHT,
@@ -70,6 +106,19 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
         render_game(renderer, &game);
         SDL_RenderPresent(renderer);
+        
+        if (game.state == CHECKING_STATE){
+            SDL_Delay(1000);
+            check_game_over_state(&game);
+        }
+        
+        if (game.state == RUNNING_STATE)
+            if (game.selection > 4){
+                SDL_Delay(1000);
+                game.state = CHECKING_STATE;
+            }
+        
+
         SDL_Delay(1000/60);
 
     }
