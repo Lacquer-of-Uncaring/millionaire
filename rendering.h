@@ -1,6 +1,8 @@
 #ifndef RENDERING_H_
 #define RENDERING_H_
 
+#define DEFAULT_FONT "resources/bahnschrift.ttf"
+
 #define INTRO_SCREEN "resources/intro.png"
 #define RUNNING_BG "resources/BG.png"
 
@@ -19,7 +21,6 @@
 #define TWOFIFTYK_SCREEN "resources/250k.png"
 #define FIVEHK_SCREEN "resources/500k.png"
 #define WIN_SCREEN "resources/WIN.png"
-
 
 void render_game(SDL_Renderer *renderer, game_t *game);
 
