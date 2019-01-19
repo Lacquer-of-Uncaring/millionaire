@@ -35,11 +35,15 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    const char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
+    const char *ANS = "ICELAND";
 
+    question test = {SAMPLETEXT, ANS, ANS, ANS, ANS, A_CORRECT};
 
     game_t game = {
-        .selection = B_CONFIRMED,
-        .state = RUNNING_STATE,
+        .questions = {test,test,test,test,test,test,test,test,test,test,test,test,test,test,test},
+        .selection = D_CONFIRMED,
+        .state = CHECKING_STATE,
         .question_number = 15
     };
 

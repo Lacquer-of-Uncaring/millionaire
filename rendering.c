@@ -156,8 +156,11 @@ void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const
         font = TTF_OpenFont(font_name, 25);
     else if (strlen(text) < 22)
         font = TTF_OpenFont(font_name, 20);
-    else
+    else if (strlen(text) < 26)
         font = TTF_OpenFont(font_name, 17);
+    else
+        font = TTF_OpenFont(font_name, 15);
+
     
     SDL_Rect dest;
     dest.x = x;
@@ -172,6 +175,15 @@ void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const
 
     TTF_CloseFont(font);
     TTF_Quit();
+}
+
+void render_text(SDL_Renderer* renderer, game_t* game){
+    question current_q = game->questions[game->question_number-1];
+    render_question(renderer, question_x, question_y, current_q.text, DEFAULT_FONT);
+    render_answer(renderer, ans_a_x, ans_a_y, current_q.ans_a, DEFAULT_FONT);
+    render_answer(renderer, ans_b_x, ans_b_y, current_q.ans_b, DEFAULT_FONT);
+    render_answer(renderer, ans_c_x, ans_c_y, current_q.ans_c, DEFAULT_FONT);
+    render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
 }
 
 void render_running_state(SDL_Renderer* renderer, game_t* game){
@@ -212,17 +224,67 @@ void render_running_state(SDL_Renderer* renderer, game_t* game){
 
     }
 
-    const char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
     render_screen(renderer, RUNNING_BG);
-    render_question(renderer, question_x, question_y, SAMPLETEXT, DEFAULT_FONT);
-    render_answer(renderer, ans_a_x, ans_a_y, "A:Shadenfreude", DEFAULT_FONT);
-    render_answer(renderer, ans_b_x, ans_b_y, "B:Ireland", DEFAULT_FONT);
-    render_answer(renderer, ans_c_x, ans_c_y, "C:Greenland", DEFAULT_FONT);
-    render_answer(renderer, ans_d_x, ans_d_y, "D:New Zealand", DEFAULT_FONT);
+    render_text(renderer,game);
+
+    //const char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
+    //render_screen(renderer, RUNNING_BG);
+    //render_question(renderer, question_x, question_y, SAMPLETEXT, DEFAULT_FONT);
+    //render_answer(renderer, ans_a_x, ans_a_y, "A:Shadenfreude", DEFAULT_FONT);
+    //render_answer(renderer, ans_b_x, ans_b_y, "B:Ireland", DEFAULT_FONT);
+    //render_answer(renderer, ans_c_x, ans_c_y, "C:GreenlandGreenlandGreenland", DEFAULT_FONT);
+    //render_answer(renderer, ans_d_x, ans_d_y, "D:New Zealand", DEFAULT_FONT);
     
 }
 
+void render_checking_state(SDL_Renderer* renderer, game_t* game){
+    
+    switch(game->selection){
+        case A_CONFIRMED:
+            render_rect(renderer, &rect_a, &red);
+            break;
+
+        case B_CONFIRMED:
+            render_rect(renderer, &rect_b, &red);
+            break;
+
+        case C_CONFIRMED:
+            render_rect(renderer, &rect_c, &red);
+            break;
+
+        case D_CONFIRMED:
+            render_rect(renderer, &rect_d, &red);
+            break;
+
+        default : {}
+    }
+
+    question current_q = game->questions[game->question_number-1];
+
+    switch(current_q.correct){
+        case A_CORRECT:
+            render_rect(renderer, &rect_a, &green);
+            break;
+
+        case B_CORRECT:
+            render_rect(renderer, &rect_b, &green);
+            break;
+
+        case C_CORRECT:
+            render_rect(renderer, &rect_c, &green);
+            break;
+
+        case D_CORRECT:
+            render_rect(renderer, &rect_d, &green);
+            break;
+
+        default : {}
+    }
+    
+    render_screen(renderer, RUNNING_BG);
+    render_text(renderer,game);
+}
 
 void render_game(SDL_Renderer *renderer, game_t *game){
-    render_running_state(renderer,game);
+    render_checking_state(renderer,game);
 }

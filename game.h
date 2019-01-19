@@ -5,6 +5,12 @@
 #define SCREEN_WIDTH 640.0
 #define SCREEN_HEIGHT 480.0
 
+// correct field in question
+#define A_CORRECT 5
+#define B_CORRECT 6 
+#define C_CORRECT 7
+#define D_CORRECT 8
+
 // Answer selction possiblities
 #define NO_SELECTION 0
 #define A_SELECTED 1
@@ -23,8 +29,18 @@
 #define QUIT_STATE 3
 
 typedef struct {
+	const char* text;
+	const char* ans_a;
+	const char* ans_b;
+	const char* ans_c;
+	const char* ans_d;
+	// int diff;
+	int correct;
+}question;
+
+typedef struct {
 	// user* player; 
-    // question questions[15]; 
+    question questions[15]; 
     int selection;
     int state;
     // int le_50;
