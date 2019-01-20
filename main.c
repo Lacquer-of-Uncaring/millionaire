@@ -110,8 +110,10 @@ int main(int argc, char *argv[])
         current = SDL_GetTicks();
 
         if (current-init > 1000){
-            game.timer--;
-            init = SDL_GetTicks();
+            if (game.state == RUNNING_STATE){
+                game.timer--;
+                init = SDL_GetTicks();
+            }        
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -124,12 +126,16 @@ int main(int argc, char *argv[])
             check_game_over_state(&game);
         }
         
-        if (game.state == RUNNING_STATE)
+        if (game.state == RUNNING_STATE){
             if (game.selection > 4){
                 SDL_Delay(1000);
                 game.state = CHECKING_STATE;
             }
-        
+            if (game.timer <= 0){
+                SDL_Delay(1000);
+                game.state = CHECKING_STATE;
+            }
+        }
 
         SDL_Delay(1000/60);
 

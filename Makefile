@@ -67,7 +67,7 @@ logic.o : logic.c logic.h game.h
 	gcc -c logic.c -o logic.o
 
 clean:
-	del rendering.o
+	del rendering.o logic.o
 
 
 #recipe for rendering.o
