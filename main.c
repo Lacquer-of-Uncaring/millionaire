@@ -52,7 +52,9 @@ int main(int argc, char *argv[])
 
     int init = SDL_GetTicks();
     int current;
+    int x,y;
 
+    // Event handling
     SDL_Event e;
     while (game.state != QUIT_STATE) {
         while (SDL_PollEvent(&e)) {
@@ -63,6 +65,7 @@ int main(int argc, char *argv[])
             case SDL_KEYDOWN:
                 switch (e.key.keysym.scancode){
                 case SDL_SCANCODE_A:
+                    // Can only select in running state and before confirming
                     if (game.state == RUNNING_STATE){
                         if (game.selection < 5)
                             game.selection = A_SELECTED;
@@ -88,6 +91,7 @@ int main(int argc, char *argv[])
                     break;
                 case SDL_SCANCODE_RETURN:
                 case SDL_SCANCODE_KP_ENTER:
+                case SDL_SCANCODE_SPACE:
                     answer_confirm(&game);
                     break;
                 case SDL_SCANCODE_BACKSPACE:
@@ -96,16 +100,20 @@ int main(int argc, char *argv[])
                             game.selection = NO_SELECTION;
                     break;
                 }
-                break; 
+                break;
+            // Mouse selection 
+            case SDL_MOUSEMOTION:
+                SDL_GetMouseState(&x,&y);
+                hover_select(&game, x, y);
+                break;
             case SDL_MOUSEBUTTONDOWN:
-                //click_on_cell(&game,
-                //              e.button.y / CELL_HEIGHT,
-                //              e.button.x / CELL_WIDTH);
+                answer_confirm(&game);
                 break;
 
             default: {}
             }
         }
+        // Done with event handling
     
         current = SDL_GetTicks();
 
