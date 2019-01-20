@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_timer.h>
 
 #include "game.h"
 #include "rendering.h"
@@ -12,7 +13,7 @@
 
 int main(int argc, char *argv[])
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0) {
         printf("error initializing SDL: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
@@ -45,9 +46,12 @@ int main(int argc, char *argv[])
         .questions = {test,test,test,test,test,test,test,test,test,test,test,test,test,test,test},
         .selection = NO_SELECTION,
         .state = RUNNING_STATE,
-        .question_number = 1
+        .question_number = 1,
+        .timer = 10
     };
 
+    int init = SDL_GetTicks();
+    int current;
 
     SDL_Event e;
     while (game.state != QUIT_STATE) {
@@ -83,6 +87,7 @@ int main(int argc, char *argv[])
                     }
                     break;
                 case SDL_SCANCODE_RETURN:
+                case SDL_SCANCODE_KP_ENTER:
                     answer_confirm(&game);
                     break;
                 case SDL_SCANCODE_BACKSPACE:
@@ -100,6 +105,13 @@ int main(int argc, char *argv[])
 
             default: {}
             }
+        }
+    
+        current = SDL_GetTicks();
+
+        if (current-init > 1000){
+            game.timer--;
+            init = SDL_GetTicks();
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

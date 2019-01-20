@@ -22,6 +22,8 @@ int ans_c_x = 65;
 int ans_c_y = 406;
 int ans_d_x = 347;
 int ans_d_y = 406;
+int timer_x = 305;
+int timer_y = 290;
 
 const SDL_Color green = { .r = 43, .g = 198, .b = 135};
 const SDL_Color red = { .r = 180, .g = 0, .b = 0};
@@ -186,6 +188,28 @@ void render_text(SDL_Renderer* renderer, game_t* game){
     render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
 }
 
+void render_timer(SDL_Renderer* renderer, game_t* game){
+    TTF_Init();
+    TTF_Font * font = TTF_OpenFont(DEFAULT_FONT, 25);
+    
+    SDL_Rect dest;
+    dest.x = timer_x;
+    dest.y = timer_y;
+    char countdown[3];
+    sprintf(countdown, "%d", game->timer);
+
+    SDL_Surface * surface = TTF_RenderText_Blended(font, countdown, white);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+
+    TTF_CloseFont(font);
+    TTF_Quit();
+}
+
+
 void render_running_state(SDL_Renderer* renderer, game_t* game){
     switch(game->selection){
         case A_SELECTED:
@@ -226,6 +250,7 @@ void render_running_state(SDL_Renderer* renderer, game_t* game){
 
     render_screen(renderer, RUNNING_BG);
     render_text(renderer,game);
+    render_timer(renderer,game);
 
     //const char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
     //render_screen(renderer, RUNNING_BG);
@@ -283,6 +308,7 @@ void render_checking_state(SDL_Renderer* renderer, game_t* game){
     
     render_screen(renderer, RUNNING_BG);
     render_text(renderer,game);
+    render_timer(renderer,game);
 }
 
 void render_game(SDL_Renderer *renderer, game_t *game){

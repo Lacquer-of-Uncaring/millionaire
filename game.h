@@ -47,7 +47,7 @@ typedef struct {
     // int le_25;
     // int q_switch;
     int question_number;
-    // int timer;
+    int timer;
 } game_t;
 
 #endif  // GAME_H_
