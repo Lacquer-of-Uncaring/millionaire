@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         .selection = NO_SELECTION,
         .state = RUNNING_STATE,
         .question_number = 1,
-        .timer = 10
+        .timer = DEFAULT_COUNTDOWN
     };
 
     int init = SDL_GetTicks();
@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
     
         current = SDL_GetTicks();
 
+        // Decrement the countdown timer every second
         if (current-init > 1000){
             if (game.state == RUNNING_STATE){
                 game.timer--;
@@ -121,11 +122,13 @@ int main(int argc, char *argv[])
         render_game(renderer, &game);
         SDL_RenderPresent(renderer);
         
+
         if (game.state == CHECKING_STATE){
             SDL_Delay(1000);
             check_game_over_state(&game);
         }
         
+        // Go into checking state if the player confirmed his answer or ran out of time
         if (game.state == RUNNING_STATE){
             if (game.selection > 4){
                 SDL_Delay(1000);

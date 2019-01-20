@@ -28,6 +28,8 @@
 #define CHECKING_STATE 2
 #define QUIT_STATE 3
 
+#define DEFAULT_COUNTDOWN 15
+
 typedef struct {
 	const char* text;
 	const char* ans_a;

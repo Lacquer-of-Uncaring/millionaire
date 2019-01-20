@@ -323,7 +323,9 @@ void render_game(SDL_Renderer *renderer, game_t *game){
             break;
 
         case GAME_OVER_STATE:
-            render_game_over_state(renderer,game);
+            //render_game_over_state(renderer,game);
+            render_screen(renderer,"resources/surprise.png");
+            break;        
 
         default : {} 
     }

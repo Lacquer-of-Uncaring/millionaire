@@ -23,6 +23,6 @@ void check_game_over_state(game_t *game){
         game->question_number += 1;
         game->selection = NO_SELECTION;
         game->state = RUNNING_STATE; 
-        game->timer = 10;
+        game->timer = DEFAULT_COUNTDOWN;
     }
 }   
