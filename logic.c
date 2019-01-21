@@ -173,7 +173,13 @@ void use_lifeline_switch(game_t* game){
         current_q->ans_d = malloc(strlen(switch_q->ans_d));
         strcpy(current_q->ans_d,switch_q->ans_d);
         current_q->correct = switch_q->correct;
+        // reset the question
         game->lifeline_switch = 0;
+        game->selection = NO_SELECTION;
+        game->A_available = 1;
+        game->B_available = 1;
+        game->C_available = 1;
+        game->D_available = 1;
         if (game->question_number < CHECKPOINT_2)
             game->timer = FIRST_COUNTDOWN;
         else if (game->question_number < CHECKPOINT_3)
