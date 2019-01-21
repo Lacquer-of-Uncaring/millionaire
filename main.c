@@ -37,24 +37,28 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    const char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
-    const char *ANS = "ICELAND";
+    char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
+    char *ANS = "ICELAND";
+    char *swi = "this is a switch question?";
+    char *ans = "lol";
 
     question test = {SAMPLETEXT, ANS, ANS, ANS, ANS, A_CORRECT};
+    question tests = {swi, ans, ans, ans, ans, B_CORRECT};
 
     game_t game = {
         .questions = {test,test,test,test,test,test,test,test,test,test,test,test,test,test,test},
+        .switch_questions = {tests,tests,tests,tests,tests,tests,tests,tests,tests,tests,tests,tests,tests,tests,tests},
         .selection = NO_SELECTION,
         .A_available = 1,
         .B_available = 1,
         .C_available = 1,
         .D_available = 1,
-        .lifeline_used_in_question = 0,
         .lifeline_50 = 1,
         .lifeline_25 = 1,
+        .lifeline_switch = 1,
         .state = RUNNING_STATE,
         .question_number = 1,
-        .timer = DEFAULT_COUNTDOWN
+        .timer = FIRST_COUNTDOWN
     };
 
     // Initializing some parameters for logic functions
@@ -78,7 +82,7 @@ int main(int argc, char *argv[])
                     use_lifeline_25(&game);
                     break;
                 case SDL_SCANCODE_3:
-                    //use_lifeline_switch(&game);
+                    use_lifeline_switch(&game);
                     break;
 
                 case SDL_SCANCODE_A:

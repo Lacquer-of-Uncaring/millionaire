@@ -22,11 +22,11 @@ int ans_c_x = 65;
 int ans_c_y = 406;
 int ans_d_x = 347;
 int ans_d_y = 406;
-int timer_x = 305;
+int timer_x = 303;
 int timer_y = 290;
 
-const SDL_Color green = { .r = 43, .g = 198, .b = 135};
-const SDL_Color red = { .r = 180, .g = 0, .b = 0};
+const SDL_Color green = { .r = 34, .g = 170, .b = 34};
+const SDL_Color red = { .r = 230, .g = 0, .b = 0};
 const SDL_Color yellow = { .r = 250, .g = 154, .b = 20};
 const SDL_Color grey = { .r = 100, .g = 100, .b = 100};
 const SDL_Color white = { .r = 255, .g = 255, .b = 255};
@@ -200,9 +200,15 @@ void render_timer(SDL_Renderer* renderer, game_t* game){
     dest.x = timer_x;
     dest.y = timer_y;
     char countdown[3];
+    SDL_Color col = white;
+    // Small adhoc tweaks
+    if (game->timer < 10)
+        dest.x += 5;
+    if (game->timer < 6)
+        col = red; 
     sprintf(countdown, "%d", game->timer);
 
-    SDL_Surface * surface = TTF_RenderText_Blended(font, countdown, white);
+    SDL_Surface * surface = TTF_RenderText_Blended(font, countdown, col);
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
     SDL_RenderCopy(renderer, texture, NULL, &dest);

@@ -1,4 +1,4 @@
-#include <time.h> 
+#include <string.h>
 #include <stdlib.h>
 
 #include <SDL2/SDL.h>
@@ -36,13 +36,17 @@ void answer_confirm(game_t *game){
 void next_question(game_t* game){
     game->question_number += 1;
     game->selection = NO_SELECTION;
-    game->state = RUNNING_STATE; 
-    game->timer = DEFAULT_COUNTDOWN;
-    game->lifeline_used_in_question = 0;
+    game->state = RUNNING_STATE;
     game->A_available = 1;
     game->B_available = 1;
     game->C_available = 1;
     game->D_available = 1;
+    if (game->question_number < CHECKPOINT_2)
+        game->timer = FIRST_COUNTDOWN;
+    else if (game->question_number < CHECKPOINT_3)
+        game->timer = SECOND_COUNTDOWN;
+    else
+        game->timer = THIRD_COUNTDOWN;
 }
 
 void check_game_over_state(game_t *game){
@@ -127,23 +131,54 @@ int delete_wrong_answer(game_t* game){
 }
 
 void use_lifeline_50(game_t* game){
-    if (game->lifeline_50 && !game->lifeline_used_in_question){
-        int r1 = delete_wrong_answer(game);
-        int r2;
-        do{
-            r2 = delete_wrong_answer(game);
-        } while (r1 == r2);
-        game->lifeline_used_in_question = 1;
-        game->lifeline_50 = 0;
-        SDL_Delay(500);
+    if (game->state == RUNNING_STATE){    
+        if (game->selection < 5){
+            if (game->lifeline_50){
+                int r1 = delete_wrong_answer(game);
+                int r2;
+                do{
+                    r2 = delete_wrong_answer(game);
+                } while (r1 == r2);
+                game->lifeline_50 = 0;
+                SDL_Delay(1000);
+            }
+        }   
     }
 }
 
 void use_lifeline_25(game_t* game){
-    if (game->lifeline_25 && !game->lifeline_used_in_question){
-        delete_wrong_answer(game);
-        game->lifeline_used_in_question = 1;
-        game->lifeline_25 = 0;
-        SDL_Delay(500);
+    if (game->state == RUNNING_STATE){    
+        if (game->selection < 5){
+            if (game->lifeline_25){
+                delete_wrong_answer(game);
+                game->lifeline_25 = 0;
+                SDL_Delay(1000);
+            }
+        }
+    }
+}
+
+void use_lifeline_switch(game_t* game){
+    if (game->lifeline_switch && game->state == RUNNING_STATE && game->selection < 5){
+        question *current_q = &game->questions[game->question_number-1];
+        question *switch_q = &game->switch_questions[game->question_number-1];
+        current_q->text = malloc(strlen(switch_q->text));
+        strcpy(current_q->text,switch_q->text);
+        current_q->ans_a = malloc(strlen(switch_q->ans_a));
+        strcpy(current_q->ans_a,switch_q->ans_a);
+        current_q->ans_b = malloc(strlen(switch_q->ans_b));
+        strcpy(current_q->ans_b,switch_q->ans_b);
+        current_q->ans_c = malloc(strlen(switch_q->ans_c));
+        strcpy(current_q->ans_c,switch_q->ans_c);
+        current_q->ans_d = malloc(strlen(switch_q->ans_d));
+        strcpy(current_q->ans_d,switch_q->ans_d);
+        current_q->correct = switch_q->correct;
+        game->lifeline_switch = 0;
+        if (game->question_number < CHECKPOINT_2)
+            game->timer = FIRST_COUNTDOWN;
+        else if (game->question_number < CHECKPOINT_3)
+            game->timer = SECOND_COUNTDOWN;
+        else
+            game->timer = THIRD_COUNTDOWN;
     }
 }

@@ -7,6 +7,6 @@ void hover_select(game_t* game, int x, int y);
 void decrement_timer(game_t* game, int* init);
 void use_lifeline_50(game_t* game);
 void use_lifeline_25(game_t* game);
-
+void use_lifeline_switch(game_t* game);
 
 #endif  // LOGIC_H_

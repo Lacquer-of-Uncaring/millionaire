@@ -28,14 +28,20 @@
 #define CHECKING_STATE 2
 #define QUIT_STATE 3
 
-#define DEFAULT_COUNTDOWN 15
+#define FIRST_COUNTDOWN 15
+#define SECOND_COUNTDOWN 30
+#define THIRD_COUNTDOWN 45
+
+#define CHECKPOINT_1 2
+#define CHECKPOINT_2 6
+#define CHECKPOINT_3 11
 
 typedef struct {
-	const char* text;
-	const char* ans_a;
-	const char* ans_b;
-	const char* ans_c;
-	const char* ans_d;
+	char* text;
+	char* ans_a;
+	char* ans_b;
+	char* ans_c;
+	char* ans_d;
 	// int diff;
 	int correct;
 }question;
@@ -43,16 +49,16 @@ typedef struct {
 typedef struct {
 	// user* player; 
     question questions[15]; 
+    question switch_questions[15];
     int selection;
     int A_available;
     int B_available;
     int C_available;
     int D_available;
-    int lifeline_used_in_question;
     int state;
     int lifeline_50;
     int lifeline_25;
-    // int q_switch;
+    int lifeline_switch;
     int question_number;
     int timer;
 } game_t;
