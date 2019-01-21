@@ -47,8 +47,7 @@ COMPILER_FLAGS = -w -Wl,-subsystem,windows
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm -lSDL2
 
 
-OBJS = main.c rendering.o logic.o
-
+OBJS = main.c rendering.o logic.o menu-items.o
 #CC specifies which compiler we're using
 CC = gcc
 
@@ -66,8 +65,11 @@ rendering.o : rendering.c rendering.h game.h
 logic.o : logic.c logic.h game.h
 	gcc -c logic.c -o logic.o
 
+menu-items.o : menu-items.c rendering.h logic.h game.h
+	gcc -c menu-items.c -o menu-items.o
+
 clean:
-	del rendering.o logic.o
+	del rendering.o logic.o menu-items.o
 
 
 #recipe for rendering.o

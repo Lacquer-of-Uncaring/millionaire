@@ -1,6 +1,7 @@
 #ifndef LOGIC_H_
 #define LOGIC_H_
 
+game_t* game_init();
 void answer_confirm(game_t *game);
 void check_game_over_state(game_t *game);
 void hover_select(game_t* game, int x, int y);

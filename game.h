@@ -44,7 +44,7 @@ typedef struct {
 	char* ans_d;
 	// int diff;
 	int correct;
-}question;
+} question;
 
 typedef struct {
 	// user* player; 
@@ -62,5 +62,11 @@ typedef struct {
     int question_number;
     int timer;
 } game_t;
+
+typedef struct {
+	char id[20];
+	char password[20];
+	int admin;
+} user;
 
 #endif  // GAME_H_

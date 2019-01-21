@@ -19,6 +19,36 @@ int box_w = 215;
 int box_h = 55;
 
 
+game_t* game_init(){
+    char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
+    char *ANS = "ICELAND";
+    char *swi = "this is a switch question?";
+    char *ans = "lol";
+
+    question test = {SAMPLETEXT, ANS, ANS, ANS, ANS, A_CORRECT};
+    question tests = {swi, ans, ans, ans, ans, B_CORRECT};
+
+    game_t* game = malloc(sizeof(game_t));
+    for (int i=0; i<15; i++){
+        game->questions[i] = test;
+        game->switch_questions[i] = tests;
+    }
+    game->selection = NO_SELECTION;
+    game->A_available = 1;
+    game->B_available = 1;
+    game->C_available = 1;
+    game->D_available = 1;
+    game->lifeline_50 = 1;
+    game->lifeline_25 = 1;
+    game->lifeline_switch = 1;
+    game->state = RUNNING_STATE;
+    game->question_number = 1;
+    game->timer = FIRST_COUNTDOWN;
+    
+    return game;   
+} 
+
+
 int check_answer(game_t *game){
     question current_q = game->questions[game->question_number-1];
     if (current_q.correct == game->selection)
@@ -86,8 +116,8 @@ void hover_select(game_t* game, int x, int y){
                 game->selection = D_SELECTED;
         }
     }
-}
 
+}
 void decrement_timer(game_t* game, int* init){
     int current = SDL_GetTicks();
     // Decrement the countdown timer every second
@@ -162,15 +192,15 @@ void use_lifeline_switch(game_t* game){
     if (game->lifeline_switch && game->state == RUNNING_STATE && game->selection < 5){
         question *current_q = &game->questions[game->question_number-1];
         question *switch_q = &game->switch_questions[game->question_number-1];
-        current_q->text = malloc(strlen(switch_q->text));
+        current_q->text = malloc(strlen(switch_q->text) + 1);
         strcpy(current_q->text,switch_q->text);
-        current_q->ans_a = malloc(strlen(switch_q->ans_a));
+        current_q->ans_a = malloc(strlen(switch_q->ans_a) + 1);
         strcpy(current_q->ans_a,switch_q->ans_a);
-        current_q->ans_b = malloc(strlen(switch_q->ans_b));
+        current_q->ans_b = malloc(strlen(switch_q->ans_b) + 1);
         strcpy(current_q->ans_b,switch_q->ans_b);
-        current_q->ans_c = malloc(strlen(switch_q->ans_c));
+        current_q->ans_c = malloc(strlen(switch_q->ans_c) + 1);
         strcpy(current_q->ans_c,switch_q->ans_c);
-        current_q->ans_d = malloc(strlen(switch_q->ans_d));
+        current_q->ans_d = malloc(strlen(switch_q->ans_d) + 1);
         strcpy(current_q->ans_d,switch_q->ans_d);
         current_q->correct = switch_q->correct;
         // reset the question
