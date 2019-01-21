@@ -22,6 +22,13 @@
 #define FIVEHK_SCREEN "resources/500k.png"
 #define WIN_SCREEN "resources/WIN.png"
 
+#define LIFELINE_50_ON "resources/50_1.png"
+#define LIFELINE_50_OFF "resources/50_0.png"
+#define LIFELINE_25_ON "resources/25_1.png"
+#define LIFELINE_25_OFF "resources/25_0.png"
+#define LIFELINE_SWITCH_ON "resources/switch_1.png"
+#define LIFELINE_SWITCH_OFF "resources/switch_0.png"
+
 void render_game(SDL_Renderer *renderer, game_t *game);
 
 #endif  // RENDERING_H_

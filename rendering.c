@@ -12,6 +12,9 @@ const SDL_Rect rect_b = { .x = 320, .y = 300, .w = 320, .h = 90};
 const SDL_Rect rect_c = { .x = 0, .y = 390, .w = 320, .h = 90};
 const SDL_Rect rect_d = { .x = 320, .y = 390, .w = 320, .h = 90};
 
+int lifeline_x = 267;
+int lifeline_y = 5;
+int lifeline_w = 35;
 int question_x = 100;
 int question_y = 80;
 int ans_a_x = 65;
@@ -219,6 +222,38 @@ void render_timer(SDL_Renderer* renderer, game_t* game){
     TTF_Quit();
 }
 
+void render_lifeline_50(SDL_Renderer* renderer, game_t* game){
+    SDL_Texture* texture;
+    if (game->lifeline_50)
+        texture = load_texture(renderer, LIFELINE_50_ON);
+    else
+        texture = load_texture(renderer, LIFELINE_50_OFF);
+    SDL_Rect dest = {.x = lifeline_x, .y = lifeline_y, .h = 25, .w = 25};
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+}
+
+void render_lifeline_25(SDL_Renderer* renderer, game_t* game){
+    SDL_Texture* texture;
+    if (game->lifeline_25)
+        texture = load_texture(renderer, LIFELINE_25_ON);
+    else
+        texture = load_texture(renderer, LIFELINE_25_OFF);
+    SDL_Rect dest = {.x = lifeline_x + lifeline_w - 1, .y = lifeline_y, .h = 25, .w = 25};
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+}
+
+void render_lifeline_switch(SDL_Renderer* renderer, game_t* game){
+    SDL_Texture* texture;
+    if (game->lifeline_switch)
+        texture = load_texture(renderer, LIFELINE_SWITCH_ON);
+    else
+        texture = load_texture(renderer, LIFELINE_SWITCH_OFF);
+    SDL_Rect dest = {.x = lifeline_x + 2*lifeline_w, .y = lifeline_y, .h = 25, .w = 25};
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+}
 
 void render_running_state(SDL_Renderer* renderer, game_t* game){
     switch(game->selection){
@@ -261,6 +296,9 @@ void render_running_state(SDL_Renderer* renderer, game_t* game){
     render_screen(renderer, RUNNING_BG);
     render_text(renderer,game);
     render_timer(renderer,game);
+    render_lifeline_50(renderer,game);
+    render_lifeline_25(renderer,game);
+    render_lifeline_switch(renderer,game);
 
     //const char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
     //render_screen(renderer, RUNNING_BG);
@@ -319,6 +357,9 @@ void render_checking_state(SDL_Renderer* renderer, game_t* game){
     render_screen(renderer, RUNNING_BG);
     render_text(renderer,game);
     render_timer(renderer,game);
+    render_lifeline_50(renderer,game);
+    render_lifeline_25(renderer,game);
+    render_lifeline_switch(renderer,game);
 }
 
 void render_game(SDL_Renderer *renderer, game_t *game){
