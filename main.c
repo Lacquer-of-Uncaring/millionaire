@@ -45,13 +45,20 @@ int main(int argc, char *argv[])
     game_t game = {
         .questions = {test,test,test,test,test,test,test,test,test,test,test,test,test,test,test},
         .selection = NO_SELECTION,
+        .A_available = 1,
+        .B_available = 1,
+        .C_available = 1,
+        .D_available = 1,
+        .lifeline_used_in_question = 0,
+        .lifeline_50 = 1,
+        .lifeline_25 = 1,
         .state = RUNNING_STATE,
         .question_number = 1,
         .timer = DEFAULT_COUNTDOWN
     };
 
+    // Initializing some parameters for logic functions
     int init = SDL_GetTicks();
-    int current;
     int x,y;
 
     // Event handling
@@ -64,28 +71,38 @@ int main(int argc, char *argv[])
                 break;
             case SDL_KEYDOWN:
                 switch (e.key.keysym.scancode){
+                case SDL_SCANCODE_1:
+                    use_lifeline_50(&game);
+                    break;
+                case SDL_SCANCODE_2:
+                    use_lifeline_25(&game);
+                    break;
+                case SDL_SCANCODE_3:
+                    //use_lifeline_switch(&game);
+                    break;
+
                 case SDL_SCANCODE_A:
                     // Can only select in running state and before confirming
                     if (game.state == RUNNING_STATE){
-                        if (game.selection < 5)
+                        if (game.selection < 5 && game.A_available)
                             game.selection = A_SELECTED;
                     }
                     break;
                 case SDL_SCANCODE_B:
                     if (game.state == RUNNING_STATE){
-                        if (game.selection < 5)
+                        if (game.selection < 5 && game.B_available)
                             game.selection = B_SELECTED;
                     }
                     break;
                 case SDL_SCANCODE_C:
                     if (game.state == RUNNING_STATE){
-                        if (game.selection < 5)
+                        if (game.selection < 5 && game.C_available)
                             game.selection = C_SELECTED;
                     }
                     break;
                 case SDL_SCANCODE_D:
                     if (game.state == RUNNING_STATE){
-                        if (game.selection < 5)
+                        if (game.selection < 5 && game.D_available)
                             game.selection = D_SELECTED;
                     }
                     break;
@@ -113,41 +130,17 @@ int main(int argc, char *argv[])
             default: {}
             }
         }
-        // Done with event handling
-    
-        current = SDL_GetTicks();
-
-        // Decrement the countdown timer every second
-        if (current-init > 1000){
-            if (game.state == RUNNING_STATE){
-                game.timer--;
-                init = SDL_GetTicks();
-            }        
-        }
+        // Done with event handling for the frame
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+
+        decrement_timer(&game, &init);
         render_game(renderer, &game);
         SDL_RenderPresent(renderer);
         
-
-        if (game.state == CHECKING_STATE){
-            SDL_Delay(1000);
-            check_game_over_state(&game);
-        }
-        
-        // Go into checking state if the player confirmed his answer or ran out of time
-        if (game.state == RUNNING_STATE){
-            if (game.selection > 4){
-                SDL_Delay(1000);
-                game.state = CHECKING_STATE;
-            }
-            if (game.timer <= 0){
-                SDL_Delay(1000);
-                game.state = CHECKING_STATE;
-            }
-        }
-
+        check_game_over_state(&game);
+        // FPS
         SDL_Delay(1000/60);
 
     }

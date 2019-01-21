@@ -182,10 +182,14 @@ void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const
 void render_text(SDL_Renderer* renderer, game_t* game){
     question current_q = game->questions[game->question_number-1];
     render_question(renderer, question_x, question_y, current_q.text, DEFAULT_FONT);
-    render_answer(renderer, ans_a_x, ans_a_y, current_q.ans_a, DEFAULT_FONT);
-    render_answer(renderer, ans_b_x, ans_b_y, current_q.ans_b, DEFAULT_FONT);
-    render_answer(renderer, ans_c_x, ans_c_y, current_q.ans_c, DEFAULT_FONT);
-    render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
+    if (game->A_available)
+        render_answer(renderer, ans_a_x, ans_a_y, current_q.ans_a, DEFAULT_FONT);
+    if (game->B_available)
+        render_answer(renderer, ans_b_x, ans_b_y, current_q.ans_b, DEFAULT_FONT);
+    if (game->C_available)    
+        render_answer(renderer, ans_c_x, ans_c_y, current_q.ans_c, DEFAULT_FONT);
+    if (game->D_available)
+        render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
 }
 
 void render_timer(SDL_Renderer* renderer, game_t* game){

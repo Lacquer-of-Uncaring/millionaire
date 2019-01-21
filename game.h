@@ -44,9 +44,14 @@ typedef struct {
 	// user* player; 
     question questions[15]; 
     int selection;
+    int A_available;
+    int B_available;
+    int C_available;
+    int D_available;
+    int lifeline_used_in_question;
     int state;
-    // int le_50;
-    // int le_25;
+    int lifeline_50;
+    int lifeline_25;
     // int q_switch;
     int question_number;
     int timer;
