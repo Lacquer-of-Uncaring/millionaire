@@ -362,7 +362,7 @@ void render_checking_state(SDL_Renderer* renderer, game_t* game){
     render_lifeline_switch(renderer,game);
 }
 
-void render_game(SDL_Renderer *renderer, game_t *game){
+void render_game(SDL_Renderer* renderer, game_t* game){
     
     switch(game->state){
         case RUNNING_STATE:
@@ -380,4 +380,55 @@ void render_game(SDL_Renderer *renderer, game_t *game){
 
         default : {} 
     }
+}
+
+// Menu rendering
+
+int m_ans_a_x = 65;
+int m_ans_a_y = 307;
+int m_ans_b_x = 347;
+int m_ans_b_y = 307;
+int m_ans_c_x = 65;
+int m_ans_c_y = 376;
+int m_ans_d_x = 347;
+int m_ans_d_y = 376;
+
+void render_opts(SDL_Renderer* renderer, menu_t* menu){
+    m_question current_q = menu->question[menu->type];
+    render_answer(renderer, m_ans_a_x, m_ans_a_y, current_q.m_ans_a, DEFAULT_FONT);
+    render_answer(renderer, m_ans_b_x, m_ans_b_y, current_q.m_ans_b, DEFAULT_FONT);
+    render_answer(renderer, m_ans_c_x, m_ans_c_y, current_q.m_ans_c, DEFAULT_FONT);
+    render_answer(renderer, m_ans_d_x, m_ans_d_y, current_q.m_ans_d, DEFAULT_FONT);
+}
+
+const SDL_Rect m_rect_a = { .x = 0, .y = 270, .w = 320, .h = 90};
+const SDL_Rect m_rect_b = { .x = 320, .y = 270, .w = 320, .h = 90};
+const SDL_Rect m_rect_c = { .x = 0, .y = 360, .w = 320, .h = 90};
+const SDL_Rect m_rect_d = { .x = 320, .y = 360, .w = 320, .h = 90};
+
+void render_menu(SDL_Renderer* renderer, menu_t* menu){
+switch(menu->selection){
+        case A_SELECTED:
+            render_rect(renderer, &m_rect_a, &grey);
+            break;
+
+        case B_SELECTED:
+            render_rect(renderer, &m_rect_b, &grey);
+            break;
+
+        case C_SELECTED:
+            render_rect(renderer, &m_rect_c, &grey);
+            break;
+
+        case D_SELECTED:
+            render_rect(renderer, &m_rect_d, &grey);
+            break;
+
+        default : {}
+
+    }
+    render_screen(renderer, MENU_BG);
+    if (menu->type == ADMIN_MENU)
+        render_answer(renderer, 440, 455, "Press R for admin options", DEFAULT_FONT);
+    render_opts(renderer, menu);
 }

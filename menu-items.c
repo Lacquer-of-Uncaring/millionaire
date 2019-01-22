@@ -5,11 +5,12 @@
 #include <SDL2/SDL_timer.h>
 
 #include "game.h"
-#include "rendering.h"
 #include "logic.h"
+#include "menu-items.h"
+#include "rendering.h"
 
 
-void game_loop(SDL_Renderer* renderer, game_t* game){
+void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
 	// Initializing some parameters for logic functions
     int init = SDL_GetTicks();
     int x,y;
@@ -20,10 +21,18 @@ void game_loop(SDL_Renderer* renderer, game_t* game){
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
             case SDL_QUIT:
+            // Exit the program entirely
                 game->state = QUIT_STATE;
+                menu->state = QUIT;
                 break;
             case SDL_KEYDOWN:
-                switch (e.key.keysym.scancode){
+                switch (e.key.keysym.scancode){ 
+                case SDL_SCANCODE_ESCAPE:
+                // Go back to menu 
+                    game->state = QUIT_STATE;
+                    menu->state = RUNNING;
+                    menu->selection = NO_SELECTION;
+                    break;
                 case SDL_SCANCODE_1:
                     use_lifeline_50(game);
                     break;
@@ -92,7 +101,7 @@ void game_loop(SDL_Renderer* renderer, game_t* game){
         render_game(renderer, game);
         SDL_RenderPresent(renderer);
         
-        check_game_over_state(game);
+        check_game_over_state(game, menu);
         // FPS
         SDL_Delay(1000/60);
 

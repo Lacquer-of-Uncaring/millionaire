@@ -6,6 +6,7 @@
 
 #include "game.h"
 #include "logic.h"
+#include "menu-items.h"
 
 int box_a_x = 65;
 int box_a_y = 325;
@@ -79,7 +80,19 @@ void next_question(game_t* game){
         game->timer = THIRD_COUNTDOWN;
 }
 
-void check_game_over_state(game_t *game){
+void check_game_over_state(game_t *game, menu_t* menu){
+    // Go back to menu when a key or a mouse button is pressed
+    if (game->state == GAME_OVER_STATE){
+        SDL_Event e;
+        do{
+            SDL_WaitEvent(&e);
+        } while(e.type != SDL_KEYDOWN && e.type != SDL_MOUSEBUTTONDOWN);
+        game->state = QUIT_STATE;
+        menu->state = RUNNING;
+        menu->selection = NO_SELECTION;
+    }   
+
+    // Check answer
     if (game->state == CHECKING_STATE){
         SDL_Delay(1000);
         if ((game->question_number == 15 && check_answer(game)) || !check_answer(game) || game->timer <= 0 )
@@ -98,8 +111,7 @@ void check_game_over_state(game_t *game){
             SDL_Delay(1000);
             game->state = CHECKING_STATE;
         }
-    }
-        
+    }     
 }   
 
 void hover_select(game_t* game, int x, int y){
@@ -216,5 +228,112 @@ void use_lifeline_switch(game_t* game){
             game->timer = SECOND_COUNTDOWN;
         else
             game->timer = THIRD_COUNTDOWN;
+    }
+}
+
+// Menu logic
+
+int m_box_a_x = 65;
+int m_box_a_y = 295;
+int m_box_b_x = 350;
+int m_box_b_y = 295;
+int m_box_c_x = 65;
+int m_box_c_y = 365;
+int m_box_d_x = 350;
+int m_box_d_y = 365;
+int m_box_w = 215;
+int m_box_h = 55;
+
+void menu_hover_select(menu_t* menu, int x, int y){
+    menu->selection = NO_SELECTION;        
+    if (x > m_box_a_x && x < m_box_a_x + m_box_w && y > m_box_a_y && y < m_box_a_y + m_box_h)
+        menu->selection = A_SELECTED;
+    if (x > m_box_b_x && x < m_box_b_x + m_box_w && y > m_box_b_y && y < m_box_b_y + m_box_h)
+        menu->selection = B_SELECTED;
+    if (x > m_box_c_x && x < m_box_c_x + m_box_w && y > m_box_c_y && y < m_box_c_y + m_box_h)
+        menu->selection = C_SELECTED;
+    if (x > m_box_d_x && x < m_box_d_x + m_box_w && y > m_box_d_y && y < m_box_d_y + m_box_h)
+        menu->selection = D_SELECTED;
+}
+
+
+void check_menu_selection(SDL_Renderer* renderer, menu_t* menu){
+    game_t* game = game_init(); // This is only fast because it returns the same game everytime
+                                // and so it stays in cache
+    SDL_Event e;
+
+    switch (menu->type){  
+
+        case INIT_MENU:
+        switch (menu->selection){
+            case A_CONFIRMED: // Login
+                // TODO
+                break;
+            case B_CONFIRMED: // Signup
+                // TODO
+                break;
+            case C_CONFIRMED: // Show instructions
+                // TODO
+                break;
+            case D_CONFIRMED: // Show stats
+                // TODO
+                break;
+            }
+            break;
+
+        case USER_MENU:
+        switch (menu->selection){
+            case A_CONFIRMED: // Start game
+                game_loop(renderer, game, menu);
+                break;
+            case B_CONFIRMED: // Logout
+                // TODO
+                break;
+            case C_CONFIRMED: // Show instructions
+                // TODO
+                break;
+            case D_CONFIRMED: // Show stats
+                // TODO
+                break;
+            }
+
+            break;
+
+        case ADMIN_MENU:
+        switch (menu->selection){
+            case A_CONFIRMED: // Start game
+                game_loop(renderer, game, menu);
+                break;
+            case B_CONFIRMED: // Logout
+                // TODO
+                break;
+            case C_CONFIRMED: // Show instructions
+                // TODO
+                break;
+            case D_CONFIRMED: // Show stats
+                // TODO
+                break;
+            }
+            break;
+
+        case ADMIN_OPS:
+        switch (menu->selection){
+            case A_CONFIRMED: // Delete an account
+                // TODO
+                break;
+            case B_CONFIRMED: // Grant admin rights
+                // TODO
+                break;
+            case C_CONFIRMED: // Add a question
+                // TODO
+                break;
+            case D_CONFIRMED: // Go Back
+                menu->type = ADMIN_MENU;
+                menu->selection = NO_SELECTION;
+                break;
+            }
+            break;
+
+        default : {}
     }
 }

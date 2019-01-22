@@ -36,6 +36,32 @@
 #define CHECKPOINT_2 6
 #define CHECKPOINT_3 11
 
+// Menu states
+#define RUNNING 0
+#define QUIT 1
+
+// Menus
+#define INIT_MENU 0
+#define USER_MENU 1
+#define ADMIN_MENU 2
+#define ADMIN_OPS 3
+
+#include "game.h"
+
+typedef struct {
+    char* m_ans_a;
+    char* m_ans_b;
+    char* m_ans_c;
+    char* m_ans_d;
+}m_question;
+
+typedef struct {
+    m_question question[4];
+    int state;
+    int selection;
+    int type;
+}menu_t;
+
 typedef struct {
 	char* text;
 	char* ans_a;
