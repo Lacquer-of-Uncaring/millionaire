@@ -49,18 +49,24 @@
 #include "game.h"
 
 typedef struct {
+    char id[20];
+    char password[20];
+    int admin;
+} user;
+
+typedef struct {
     char* m_ans_a;
     char* m_ans_b;
     char* m_ans_c;
     char* m_ans_d;
-}m_question;
+} m_question;
 
 typedef struct {
     m_question question[4];
     int state;
     int selection;
     int type;
-}menu_t;
+} menu_t;
 
 typedef struct {
 	char* text;
@@ -88,11 +94,5 @@ typedef struct {
     int question_number;
     int timer;
 } game_t;
-
-typedef struct {
-	char id[20];
-	char password[20];
-	int admin;
-} user;
 
 #endif  // GAME_H_

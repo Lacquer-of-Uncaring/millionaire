@@ -64,7 +64,7 @@ void answer_confirm(game_t *game){
     }
 }
 
-void next_question(game_t* game){
+void next_question(game_t* game, int* animate){
     game->question_number += 1;
     game->selection = NO_SELECTION;
     game->state = RUNNING_STATE;
@@ -78,9 +78,10 @@ void next_question(game_t* game){
         game->timer = SECOND_COUNTDOWN;
     else
         game->timer = THIRD_COUNTDOWN;
+    *animate = 1;
 }
 
-void check_game_over_state(game_t *game, menu_t* menu){
+void check_game_over_state(game_t *game, menu_t* menu, int* animate){
     // Go back to menu when a key or a mouse button is pressed
     if (game->state == GAME_OVER_STATE){
         SDL_Event e;
@@ -91,16 +92,14 @@ void check_game_over_state(game_t *game, menu_t* menu){
         menu->state = RUNNING;
         menu->selection = NO_SELECTION;
     }   
-
     // Check answer
     if (game->state == CHECKING_STATE){
         SDL_Delay(1000);
         if ((game->question_number == 15 && check_answer(game)) || !check_answer(game) || game->timer <= 0 )
             game->state = GAME_OVER_STATE;
         else
-            next_question(game);
+            next_question(game,animate);
     }
-
     // Go into checking state if the player confirmed his answer or ran out of time
     if (game->state == RUNNING_STATE){
         if (game->selection > 4){
@@ -200,7 +199,7 @@ void use_lifeline_25(game_t* game){
     }
 }
 
-void use_lifeline_switch(game_t* game){
+void use_lifeline_switch(game_t* game, int* animate){
     if (game->lifeline_switch && game->state == RUNNING_STATE && game->selection < 5){
         question *current_q = &game->questions[game->question_number-1];
         question *switch_q = &game->switch_questions[game->question_number-1];
@@ -228,6 +227,7 @@ void use_lifeline_switch(game_t* game){
             game->timer = SECOND_COUNTDOWN;
         else
             game->timer = THIRD_COUNTDOWN;
+        *animate = 1;
     }
 }
 
@@ -258,10 +258,8 @@ void menu_hover_select(menu_t* menu, int x, int y){
 
 
 void check_menu_selection(SDL_Renderer* renderer, menu_t* menu){
-    game_t* game = game_init(); // This is only fast because it returns the same game everytime
-                                // and so it stays in cache
-    SDL_Event e;
-
+    game_t* game = game_init(); // This is only fast because it returns 
+                                // the same game everytime and so it stays in cache
     switch (menu->type){  
 
         case INIT_MENU:

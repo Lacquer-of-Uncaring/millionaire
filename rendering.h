@@ -29,7 +29,7 @@
 #define LIFELINE_SWITCH_ON "resources/switch_1.png"
 #define LIFELINE_SWITCH_OFF "resources/switch_0.png"
 
-void render_game(SDL_Renderer *renderer, game_t *game);
+void render_game(SDL_Renderer *renderer, game_t *game, int* animate);
 void render_menu(SDL_Renderer* renderer, menu_t *menu);
 
 #endif  // RENDERING_H_

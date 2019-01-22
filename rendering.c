@@ -182,17 +182,39 @@ void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const
     TTF_Quit();
 }
 
-void render_text(SDL_Renderer* renderer, game_t* game){
+void render_text(SDL_Renderer* renderer, game_t* game, int* animate){
     question current_q = game->questions[game->question_number-1];
-    render_question(renderer, question_x, question_y, current_q.text, DEFAULT_FONT);
-    if (game->A_available)
+    if (*animate){
+        SDL_Delay(500);
+        render_question(renderer, question_x, question_y, current_q.text, DEFAULT_FONT);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(2000);    
         render_answer(renderer, ans_a_x, ans_a_y, current_q.ans_a, DEFAULT_FONT);
-    if (game->B_available)
+        SDL_RenderPresent(renderer);
+        SDL_Delay(700);
         render_answer(renderer, ans_b_x, ans_b_y, current_q.ans_b, DEFAULT_FONT);
-    if (game->C_available)    
+        SDL_RenderPresent(renderer);
+        SDL_Delay(700);    
         render_answer(renderer, ans_c_x, ans_c_y, current_q.ans_c, DEFAULT_FONT);
-    if (game->D_available)
+        SDL_RenderPresent(renderer);
+        SDL_Delay(700);
         render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(700);
+        *animate = 0;
+    }
+
+    else{
+        render_question(renderer, question_x, question_y, current_q.text, DEFAULT_FONT);
+        if (game->A_available)
+            render_answer(renderer, ans_a_x, ans_a_y, current_q.ans_a, DEFAULT_FONT);
+        if (game->B_available)
+            render_answer(renderer, ans_b_x, ans_b_y, current_q.ans_b, DEFAULT_FONT);
+        if (game->C_available)    
+            render_answer(renderer, ans_c_x, ans_c_y, current_q.ans_c, DEFAULT_FONT);
+        if (game->D_available)
+            render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
+    }
 }
 
 void render_timer(SDL_Renderer* renderer, game_t* game){
@@ -255,7 +277,7 @@ void render_lifeline_switch(SDL_Renderer* renderer, game_t* game){
     SDL_DestroyTexture(texture);
 }
 
-void render_running_state(SDL_Renderer* renderer, game_t* game){
+void render_running_state(SDL_Renderer* renderer, game_t* game, int* animate){
     switch(game->selection){
         case A_SELECTED:
             render_rect(renderer, &rect_a, &grey);
@@ -294,12 +316,14 @@ void render_running_state(SDL_Renderer* renderer, game_t* game){
     }
 
     render_screen(renderer, RUNNING_BG);
-    render_text(renderer,game);
     render_timer(renderer,game);
     render_lifeline_50(renderer,game);
     render_lifeline_25(renderer,game);
     render_lifeline_switch(renderer,game);
-
+    if (*animate){
+        SDL_RenderPresent(renderer);
+    }
+    render_text(renderer,game,animate);
     //const char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
     //render_screen(renderer, RUNNING_BG);
     //render_question(renderer, question_x, question_y, SAMPLETEXT, DEFAULT_FONT);
@@ -353,20 +377,20 @@ void render_checking_state(SDL_Renderer* renderer, game_t* game){
 
         default : {}
     }
-    
+    int animate = 0;
     render_screen(renderer, RUNNING_BG);
-    render_text(renderer,game);
     render_timer(renderer,game);
     render_lifeline_50(renderer,game);
     render_lifeline_25(renderer,game);
     render_lifeline_switch(renderer,game);
+    render_text(renderer,game,&animate);
 }
 
-void render_game(SDL_Renderer* renderer, game_t* game){
+void render_game(SDL_Renderer* renderer, game_t* game, int* animate){
     
     switch(game->state){
         case RUNNING_STATE:
-            render_running_state(renderer,game);
+            render_running_state(renderer,game,animate);
             break;
 
         case CHECKING_STATE:

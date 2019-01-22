@@ -14,6 +14,7 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
 	// Initializing some parameters for logic functions
     int init = SDL_GetTicks();
     int x,y;
+    int animate = 1;
 
     // Event handling
     SDL_Event e;
@@ -40,7 +41,7 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
                     use_lifeline_25(game);
                     break;
                 case SDL_SCANCODE_3:
-                    use_lifeline_switch(game);
+                    use_lifeline_switch(game,&animate);
                     break;
 
                 case SDL_SCANCODE_A:
@@ -98,10 +99,10 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
         SDL_RenderClear(renderer);
 
         decrement_timer(game, &init);
-        render_game(renderer, game);
+        render_game(renderer, game, &animate);
         SDL_RenderPresent(renderer);
         
-        check_game_over_state(game, menu);
+        check_game_over_state(game, menu, &animate);
         // FPS
         SDL_Delay(1000/60);
 
