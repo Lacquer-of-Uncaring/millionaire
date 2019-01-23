@@ -15,6 +15,7 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
     int init = SDL_GetTicks();
     int x,y;
     int animate = 1;
+    int walk_away = 0;
 
     // Event handling
     SDL_Event e;
@@ -30,9 +31,10 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
                 switch (e.key.keysym.scancode){ 
                 case SDL_SCANCODE_ESCAPE:
                 // Go back to menu 
-                    game->state = QUIT_STATE;
-                    menu->state = RUNNING;
-                    menu->selection = NO_SELECTION;
+                    walk_away = 1;
+                    game->state = GAME_OVER_STATE;
+                    //menu->state = RUNNING;
+                    //menu->selection = NO_SELECTION;
                     break;
                 case SDL_SCANCODE_1:
                     use_lifeline_50(game);
@@ -99,7 +101,7 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
         SDL_RenderClear(renderer);
 
         decrement_timer(game, &init);
-        render_game(renderer, game, &animate);
+        render_game(renderer, game, &animate, &walk_away);
         SDL_RenderPresent(renderer);
         
         check_game_over_state(game, menu, &animate);

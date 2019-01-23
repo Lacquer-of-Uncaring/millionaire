@@ -46,13 +46,16 @@
 #define ADMIN_MENU 2
 #define ADMIN_OPS 3
 
-#include "game.h"
-
 typedef struct {
     char id[20];
     char password[20];
     int admin;
-} user;
+} user_t;
+
+typedef struct _n{
+    user_t* user;
+    struct _n* next;
+} node;
 
 typedef struct {
     char* m_ans_a;

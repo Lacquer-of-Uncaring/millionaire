@@ -73,11 +73,11 @@ void next_question(game_t* game, int* animate){
     game->C_available = 1;
     game->D_available = 1;
     if (game->question_number < CHECKPOINT_2)
-        game->timer = FIRST_COUNTDOWN;
+        game->timer = FIRST_COUNTDOWN + 1;
     else if (game->question_number < CHECKPOINT_3)
-        game->timer = SECOND_COUNTDOWN;
+        game->timer = SECOND_COUNTDOWN + 1;
     else
-        game->timer = THIRD_COUNTDOWN;
+        game->timer = THIRD_COUNTDOWN + 1;
     *animate = 1;
 }
 
@@ -230,6 +230,24 @@ void use_lifeline_switch(game_t* game, int* animate){
         *animate = 1;
     }
 }
+
+// User logic
+
+node* user_search(node* head, char* id){
+    // Base case 
+    if (head == NULL) 
+        return NULL; 
+      
+    // If id is in node
+    if (!strcmp(head->user->id, id))
+        return head; 
+  
+    // Recur for remaining list 
+    return user_search(head->next, id);
+}
+
+
+
 
 // Menu logic
 

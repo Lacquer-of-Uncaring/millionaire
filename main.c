@@ -38,6 +38,16 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    // Root user initialisation
+    user_t root = {
+        .id = "root",
+        .password = "root",
+        .admin = 1
+    };
+
+    node head = {&root, NULL};
+    //load_users(&head);
+
     // Menu initialisation
     char* start = "START";
     char* login = "LOGIN";

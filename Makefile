@@ -59,7 +59,7 @@ OBJ_NAME = game.exe
 all : $(OBJS)
 	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
 
-rendering.o : rendering.c rendering.h game.h 
+rendering.o : rendering.c rendering.h game.h logic.h
 	gcc -c rendering.c -o rendering.o 
 
 logic.o : logic.c logic.h game.h menu-items.h

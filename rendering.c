@@ -6,6 +6,7 @@
 
 #include "game.h"
 #include "rendering.h"
+#include "logic.h"
 
 const SDL_Rect rect_a = { .x = 0, .y = 300, .w = 320, .h = 90};
 const SDL_Rect rect_b = { .x = 320, .y = 300, .w = 320, .h = 90};
@@ -64,69 +65,79 @@ void render_screen(SDL_Renderer* renderer, const char* path){
 
 }
 
-void render_game_over_state(SDL_Renderer* renderer, game_t* game){
-    switch (game->question_number) {
-    case 1:
-        render_screen(renderer, H_SCREEN);
-        break;
+void render_game_over_state(SDL_Renderer* renderer, game_t* game, int* walk_away){
+    if (*walk_away){    
+        switch (game->question_number) {
+        case 2:
+            render_screen(renderer, H_SCREEN);
+            break;
 
-    case 2:
-        render_screen(renderer, TWOH_SCREEN);
-        break;
+        case 3:
+            render_screen(renderer, TWOH_SCREEN);
+            break;
 
-    case 3:
-        render_screen(renderer, THREEH_SCREEN);
-        break;
+        case 4:
+            render_screen(renderer, THREEH_SCREEN);
+            break;
 
-    case 4:
-        render_screen(renderer, FIVEH_SCREEN);
-        break;
+        case 5:
+            render_screen(renderer, FIVEH_SCREEN);
+            break;
 
-    case 5:
-        render_screen(renderer, ONEK_SCREEN);
-        break;
-    
-    case 6:
-        render_screen(renderer, TWOK_SCREEN);
-        break;
-    
-    case 7:
-        render_screen(renderer, FOURK_SCREEN);
-        break;
-    
-    case 8:
-        render_screen(renderer, EIGHTK_SCREEN);
-        break;
-    
-    case 9:
-        render_screen(renderer, SIXTEENK_SCREEN);
-        break;
-    
-    case 10:
-        render_screen(renderer, THIRTYTWOK_SCREEN);
-        break;
-    
-    case 11:
-        render_screen(renderer, SIXTYFOURK_SCREEN);
-        break;
-    
-    case 12:
-        render_screen(renderer, ONETWENTYFIVEK_SCREEN);
-        break;
-    
-    case 13:
-        render_screen(renderer, TWOFIFTYK_SCREEN);
-        break;
-    
-    case 14:
-        render_screen(renderer, FIVEHK_SCREEN);
-        break;
-    
-    case 15:
-        render_screen(renderer, WIN_SCREEN);
-        break;
-    
-    default: {}
+        case 6:
+            render_screen(renderer, ONEK_SCREEN);
+            break;
+        
+        case 7:
+            render_screen(renderer, TWOK_SCREEN);
+            break;
+        
+        case 8:
+            render_screen(renderer, FOURK_SCREEN);
+            break;
+        
+        case 9:
+            render_screen(renderer, EIGHTK_SCREEN);
+            break;
+        
+        case 10:
+            render_screen(renderer, SIXTEENK_SCREEN);
+            break;
+        
+        case 11:
+            render_screen(renderer, THIRTYTWOK_SCREEN);
+            break;
+        
+        case 12:
+            render_screen(renderer, SIXTYFOURK_SCREEN);
+            break;
+        
+        case 13:
+            render_screen(renderer, ONETWENTYFIVEK_SCREEN);
+            break;
+        
+        case 14:
+            render_screen(renderer, TWOFIFTYK_SCREEN);
+            break;
+        
+        case 15:
+            render_screen(renderer, FIVEHK_SCREEN);
+            break;
+           
+        default: {}
+        }
+    } else {
+        if (game->question_number < CHECKPOINT_1){
+            //
+        } else if (game->question_number < CHECKPOINT_2){
+            render_screen(renderer, H_SCREEN);
+        } else if (game->question_number < CHECKPOINT_3){
+            render_screen(renderer, ONEK_SCREEN);
+        } else {
+            render_screen(renderer, THIRTYTWOK_SCREEN);
+        }
+        if (game->question_number == 15 && check_answer(game))
+            render_screen(renderer, WIN_SCREEN);    
     }
 }
 
@@ -182,25 +193,111 @@ void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const
     TTF_Quit();
 }
 
+void render_money(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name){
+    TTF_Init();
+    TTF_Font * font = TTF_OpenFont(font_name, 17);
+   
+    SDL_Rect dest;
+    dest.x = x;
+    dest.y = y;
+
+    SDL_Surface * surface = TTF_RenderText_Blended(font, text, white);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+
+    TTF_CloseFont(font);
+    TTF_Quit();
+}
+
 void render_text(SDL_Renderer* renderer, game_t* game, int* animate){
     question current_q = game->questions[game->question_number-1];
+    char q_number[3]; 
+    sprintf(q_number, "%d", game->question_number);
+    render_answer(renderer, 440, 453, "Question number : ", DEFAULT_FONT);
+    render_answer(renderer, 610, 450, q_number, DEFAULT_FONT);
+    switch (game->question_number) {
+        case 1:
+            render_money(renderer, 5, 455, "0 DHS / 0 DHS", DEFAULT_FONT);
+            break;
+
+        case 2:
+            render_money(renderer, 5, 455, "100 DHS / 100 DHS", DEFAULT_FONT);
+            break;
+
+        case 3:
+            render_money(renderer, 5, 455, "200 DHS / 100 DHS", DEFAULT_FONT);
+            break;
+
+        case 4:
+             render_money(renderer, 5, 455, "300 DHS / 100 DHS", DEFAULT_FONT);
+            break;
+
+        case 5:
+             render_money(renderer, 5, 455, "500 DHS / 100 DHS", DEFAULT_FONT);
+            break;
+
+        case 6:
+             render_money(renderer, 5, 455, "1k DHS / 1k DHS", DEFAULT_FONT);
+            break;
+        
+        case 7:
+             render_money(renderer, 5, 455, "2k DHS / 1k DHS", DEFAULT_FONT);
+            break;
+        
+        case 8:
+             render_money(renderer, 5, 455, "4k DHS / 1k DHS", DEFAULT_FONT);
+            break;
+        
+        case 9:
+             render_money(renderer, 5, 455, "8k DHS / 1k DHS", DEFAULT_FONT);
+            break;
+        
+        case 10:
+             render_money(renderer, 5, 455, "16k DHS / 1k DHS", DEFAULT_FONT);
+            break;
+        
+        case 11:
+             render_money(renderer, 5, 455, "32k DHS / 32k DHS", DEFAULT_FONT);
+            break;
+        
+        case 12:
+             render_money(renderer, 5, 455, "64k DHS / 32k DHS", DEFAULT_FONT);
+            break;
+        
+        case 13:
+             render_money(renderer, 5, 455, "125k DHS / 32k DHS", DEFAULT_FONT);
+            break;
+        
+        case 14:
+             render_money(renderer, 5, 455, "250k DHS / 32k DHS", DEFAULT_FONT);
+            break;
+        
+        case 15:
+             render_money(renderer, 5, 455, "500k DHS / 32k DHS", DEFAULT_FONT);
+            break;
+           
+        default: {}
+        }
+
     if (*animate){
-        SDL_Delay(500);
+        SDL_Delay(300);
         render_question(renderer, question_x, question_y, current_q.text, DEFAULT_FONT);
         SDL_RenderPresent(renderer);
         SDL_Delay(2000);    
         render_answer(renderer, ans_a_x, ans_a_y, current_q.ans_a, DEFAULT_FONT);
         SDL_RenderPresent(renderer);
-        SDL_Delay(700);
+        SDL_Delay(1000);
         render_answer(renderer, ans_b_x, ans_b_y, current_q.ans_b, DEFAULT_FONT);
         SDL_RenderPresent(renderer);
-        SDL_Delay(700);    
+        SDL_Delay(1000);    
         render_answer(renderer, ans_c_x, ans_c_y, current_q.ans_c, DEFAULT_FONT);
         SDL_RenderPresent(renderer);
-        SDL_Delay(700);
+        SDL_Delay(1000);
         render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
         SDL_RenderPresent(renderer);
-        SDL_Delay(700);
         *animate = 0;
     }
 
@@ -323,15 +420,7 @@ void render_running_state(SDL_Renderer* renderer, game_t* game, int* animate){
     if (*animate){
         SDL_RenderPresent(renderer);
     }
-    render_text(renderer,game,animate);
-    //const char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
-    //render_screen(renderer, RUNNING_BG);
-    //render_question(renderer, question_x, question_y, SAMPLETEXT, DEFAULT_FONT);
-    //render_answer(renderer, ans_a_x, ans_a_y, "A:Shadenfreude", DEFAULT_FONT);
-    //render_answer(renderer, ans_b_x, ans_b_y, "B:Ireland", DEFAULT_FONT);
-    //render_answer(renderer, ans_c_x, ans_c_y, "C:GreenlandGreenlandGreenland", DEFAULT_FONT);
-    //render_answer(renderer, ans_d_x, ans_d_y, "D:New Zealand", DEFAULT_FONT);
-    
+    render_text(renderer,game,animate);    
 }
 
 void render_checking_state(SDL_Renderer* renderer, game_t* game){
@@ -386,7 +475,7 @@ void render_checking_state(SDL_Renderer* renderer, game_t* game){
     render_text(renderer,game,&animate);
 }
 
-void render_game(SDL_Renderer* renderer, game_t* game, int* animate){
+void render_game(SDL_Renderer* renderer, game_t* game, int* animate, int* walk_away){
     
     switch(game->state){
         case RUNNING_STATE:
@@ -398,8 +487,9 @@ void render_game(SDL_Renderer* renderer, game_t* game, int* animate){
             break;
 
         case GAME_OVER_STATE:
-            //render_game_over_state(renderer,game);
-            render_screen(renderer,"resources/surprise.png");
+            render_game_over_state(renderer,game,walk_away);
+            render_answer(renderer, 440, 455, "Press any key to continue", DEFAULT_FONT);
+            //render_screen(renderer,"resources/surprise.png");
             break;        
 
         default : {} 
