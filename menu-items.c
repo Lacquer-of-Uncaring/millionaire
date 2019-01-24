@@ -130,16 +130,11 @@ void text_input(SDL_Renderer* renderer, menu_t* menu, char* text){
                     /* Add new text onto the end of our text */
                     strcat(text, e.text.text);
                     break;
-                case SDL_TEXTEDITING:
-                    /*
-                    Update the composition text.
-                    Update the cursor position.
-                    Update the selection length (if any).
-                    
-                    composition = e.edit.text;
-                    cursor = e.edit.start;
-                    selection_len = e.edit.length;
-                    */
+                case SDL_KEYDOWN:
+                    switch (e.key.keysym.scancode){ 
+                        case SDL_SCANCODE_BACKSPACE:
+                            text[strlen(text)-1]=0;
+                    }
                     break;
             }
         }
