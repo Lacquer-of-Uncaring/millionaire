@@ -34,5 +34,6 @@ void render_game(SDL_Renderer *renderer, game_t *game, int* animate, int* walk_a
 void render_menu(SDL_Renderer* renderer, menu_t *menu);
 void render_stats(SDL_Renderer* renderer, stats* global_stats);
 void render_text_input(SDL_Renderer* renderer, char* text, char* hidden, int level);
+void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name);
 
 #endif  // RENDERING_H_

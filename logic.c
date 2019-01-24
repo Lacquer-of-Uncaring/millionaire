@@ -429,7 +429,7 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
                 username_input(renderer,menu,id,passwd);
                 break;
             case B_CONFIRMED: // Signup
-                // TODO
+                signup_input(renderer,menu,id,passwd);
                 break;
             case C_CONFIRMED: // Show instructions
                 // TODO

@@ -21,6 +21,7 @@ user_t root = {
 user_t current_user; 
 
 node head = {&root, NULL};
+node* list_root = &head;
 
 // User logic
 
@@ -35,6 +36,27 @@ node* user_search(node* head, char* id){
   
     // Recur for remaining list 
     return user_search(head->next, id);
+}
+
+int compare(node *one , node *two){
+return strcmp(one->user->id, two->user->id);
+}
+
+void user_add(node **pp, char* id, char* passwd, int (*cmp)(node *l, node *r)) {
+    node* new = malloc(sizeof(node));
+    user_t* user = malloc(sizeof(user_t));
+    new->user = user;
+    strcpy(new->user->id,id);
+    strcpy(new->user->password,passwd);
+    new->user->admin = 0;
+
+    for ( ; *pp != NULL; pp = &(*pp)->next) {
+        if (cmp(*pp, new) > 0 )
+            break;
+        }
+
+    new->next = *pp;
+    *pp = new;
 }
 
 void passwd_input(SDL_Renderer* renderer, menu_t* menu, user_t* username, char* id, char* passwd, int* success){
@@ -235,6 +257,116 @@ void username_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd
                         }
                         else
                             passwd_input(renderer,menu,username->user,id,passwd,&success);
+                        break;
+                    }
+                    break;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        render_text_input(renderer,id,passwd,level);
+        SDL_RenderPresent(renderer);
+    
+        SDL_Delay(1000/60);
+    }
+    menu->selection = NO_SELECTION;
+}
+
+
+void signup_passwd_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd, int* success){
+    int done = 0;
+    int level = 1;
+    SDL_StartTextInput();
+    while (!done) {
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    /* Quit */
+                    done = 1;
+                    menu->state = QUIT;
+                    break;
+                case SDL_TEXTINPUT:
+                    /* Add new id onto the end of our id */
+                    if (strlen(passwd) < 20)
+                        strcat(passwd, e.text.text);
+                    break;
+                case SDL_KEYDOWN:
+                    switch (e.key.keysym.scancode){ 
+                    case SDL_SCANCODE_ESCAPE:
+                        //passwd = calloc(1,21);
+                        passwd[0] = 0;
+                        done = 1;
+                        break;
+                    case SDL_SCANCODE_BACKSPACE:
+                        passwd[strlen(passwd)-1] = 0;
+                        break;
+                    case SDL_SCANCODE_RETURN:
+                        if (strlen(passwd)){
+                            // Successful signup!
+                            user_add(&list_root,id,passwd,compare);                            
+                            menu->selection = NO_SELECTION;
+                            *success = 1;
+                            done = 1;
+                        }
+                        else{
+                            passwd[0] = 0;
+                        }
+                            
+                        break;
+                    }
+                    break;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        render_text_input(renderer,id,passwd,level);
+        SDL_RenderPresent(renderer);
+    
+        SDL_Delay(1000/60);
+    }
+}
+
+void signup_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd){
+    int done = 0;
+    int level = 0;
+    int success = 0;
+    node* username;
+    SDL_StartTextInput();
+    while (!done && !success) {
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    /* Quit */
+                    done = 1;
+                    menu->state = QUIT;
+                    break;
+                case SDL_TEXTINPUT:
+                    /* Add new id onto the end of our id */
+                    if (strlen(id) < 20)
+                        strcat(id, e.text.text);
+                    break;
+                case SDL_KEYDOWN:
+                    switch (e.key.keysym.scancode){ 
+                    case SDL_SCANCODE_ESCAPE:
+                        done = 1;
+                        id = calloc(1,21);
+                        menu->selection = NO_SELECTION;
+                        break;
+                    case SDL_SCANCODE_BACKSPACE:
+                        id[strlen(id)-1] = 0;
+                        break;
+                    case SDL_SCANCODE_RETURN:
+                        username = user_search(&head,id);
+                        if (username != NULL){
+                            id = calloc(1,21);
+                            render_answer(renderer, 5, 450, "Username Taken :c", DEFAULT_FONT);
+                            SDL_RenderPresent(renderer);
+                            SDL_Delay(500);
+                        }
+                        else
+                            signup_passwd_input(renderer,menu,id,passwd,&success);
                         break;
                     }
                     break;
