@@ -10,6 +10,90 @@
 #include "menu-items.h"
 #include "rendering.h"
 
+// Root user initialisation
+user_t root = {
+    .id = "root",
+    .password = "root",
+    .admin = 1
+};
+
+// Current user
+user_t current_user; 
+
+node head = {&root, NULL};
+
+// User logic
+
+node* user_search(node* head, char* id){
+    // Base case 
+    if (head == NULL) 
+        return NULL; 
+      
+    // If id is in node
+    if (!strcmp(head->user->id, id))
+        return head; 
+  
+    // Recur for remaining list 
+    return user_search(head->next, id);
+}
+
+void passwd_input(SDL_Renderer* renderer, menu_t* menu, user_t* username, char* id, char* passwd, int* success){
+    int done = 0;
+    int level = 1;
+    SDL_StartTextInput();
+    while (!done) {
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    /* Quit */
+                    done = 1;
+                    menu->state = QUIT;
+                    break;
+                case SDL_TEXTINPUT:
+                    /* Add new id onto the end of our id */
+                    if (strlen(passwd) < 20)
+                        strcat(passwd, e.text.text);
+                    break;
+                case SDL_KEYDOWN:
+                    switch (e.key.keysym.scancode){ 
+                    case SDL_SCANCODE_ESCAPE:
+                        //passwd = calloc(1,21);
+                        passwd[0] = 0;
+                        done = 1;
+                        break;
+                    case SDL_SCANCODE_BACKSPACE:
+                        passwd[strlen(passwd)-1] = 0;
+                        break;
+                    case SDL_SCANCODE_RETURN:
+                        if (!strcmp(username->password, passwd)){
+                            // Successful login!
+                            if (username->admin)
+                                menu->type = ADMIN_MENU;
+                            else
+                                menu->type = USER_MENU;
+                            strcpy(menu->user_id,username->id);
+                            menu->selection = NO_SELECTION;
+                            *success = 1;
+                            done = 1;
+                        }
+                        else{
+                            passwd[0] = 0;
+                        }
+                            
+                        break;
+                    }
+                    break;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        render_text_input(renderer,id,passwd,level);
+        SDL_RenderPresent(renderer);
+    
+        SDL_Delay(1000/60);
+    }
+}
 
 void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
 	// Initializing some parameters for logic functions
@@ -114,10 +198,13 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
     }
 }
 
-void text_input(SDL_Renderer* renderer, menu_t* menu, char* text){
+void username_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd){
     int done = 0;
+    int level = 0;
+    int success = 0;
+    node* username;
     SDL_StartTextInput();
-    while (!done) {
+    while (!done && !success) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
@@ -127,38 +214,38 @@ void text_input(SDL_Renderer* renderer, menu_t* menu, char* text){
                     menu->state = QUIT;
                     break;
                 case SDL_TEXTINPUT:
-                    /* Add new text onto the end of our text */
-                    strcat(text, e.text.text);
+                    /* Add new id onto the end of our id */
+                    if (strlen(id) < 20)
+                        strcat(id, e.text.text);
                     break;
                 case SDL_KEYDOWN:
                     switch (e.key.keysym.scancode){ 
-                        case SDL_SCANCODE_BACKSPACE:
-                            text[strlen(text)-1]=0;
+                    case SDL_SCANCODE_ESCAPE:
+                        done = 1;
+                        id = calloc(1,21);
+                        menu->selection = NO_SELECTION;
+                        break;
+                    case SDL_SCANCODE_BACKSPACE:
+                        id[strlen(id)-1] = 0;
+                        break;
+                    case SDL_SCANCODE_RETURN:
+                        username = user_search(&head,id);
+                        if (username == NULL){
+                            id = calloc(1,21);
+                        }
+                        else
+                            passwd_input(renderer,menu,username->user,id,passwd,&success);
+                        break;
                     }
                     break;
             }
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        render_text_input(renderer,text);
+        render_text_input(renderer,id,passwd,level);
         SDL_RenderPresent(renderer);
     
         SDL_Delay(1000/60);
     }
+    menu->selection = NO_SELECTION;
 }
-
-// User logic
-
-node* user_search(node* head, char* id){
-    // Base case 
-    if (head == NULL) 
-        return NULL; 
-      
-    // If id is in node
-    if (!strcmp(head->user->id, id))
-        return head; 
-  
-    // Recur for remaining list 
-    return user_search(head->next, id);
-}
-

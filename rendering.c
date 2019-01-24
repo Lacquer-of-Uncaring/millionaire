@@ -253,6 +253,26 @@ void render_20(SDL_Renderer* renderer, int x, int y, const char* text, const cha
     TTF_Quit();
 }
 
+
+void render_25_centered(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name){
+    TTF_Init();
+    TTF_Font * font = TTF_OpenFont(font_name, 25);
+
+    SDL_Surface * surface = TTF_RenderText_Blended(font, text, white);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);    
+    SDL_Rect dest;
+    SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+    dest.x = x - dest.w/2;
+    dest.y = y;
+
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+
+    TTF_CloseFont(font);
+    TTF_Quit();
+}
+
 void render_text(SDL_Renderer* renderer, game_t* game, int* animate){
     question current_q = game->questions[game->question_number-1];
     char q_number[3]; 
@@ -631,6 +651,26 @@ void render_stats(SDL_Renderer* renderer, stats* global_stats){
     render_25(renderer, 400, 400 - 25, lifeline_switch_uses, DEFAULT_FONT);
 }
 
-void render_text_input(SDL_Renderer* renderer, char* text){
-    render_25(renderer, 320, 240, text, DEFAULT_FONT);
+void render_text_input(SDL_Renderer* renderer, char* text, char* hidden, int level){
+    char passwd[20] = "";
+    // hiding password
+    for (int i=0; i<strlen(hidden); i++)
+        strcat(passwd,"*");
+    render_25_centered(renderer, 320, 270, passwd, DEFAULT_FONT);
+    render_25_centered(renderer, 320, 173, text, DEFAULT_FONT);
+    render_screen(renderer, CRED_SCREEN);
+    render_money(renderer, 275, 130, "Username : ", DEFAULT_FONT);
+    render_money(renderer, 275, 225, "Password : ", DEFAULT_FONT);
+    // Indicators
+    if (level == 0){
+        render_25(renderer, 150, 173, "O", DEFAULT_FONT);
+        render_25(renderer, 470, 173, "O", DEFAULT_FONT);
+    }
+
+    else{
+        render_25(renderer, 150, 270, "O", DEFAULT_FONT);
+        render_25(renderer, 470, 270, "O", DEFAULT_FONT);
+    }
+    render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT);
+
 }

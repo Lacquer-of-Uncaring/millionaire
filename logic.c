@@ -419,13 +419,14 @@ void menu_hover_select(menu_t* menu, int x, int y){
 void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
     game = game_init(menu); // This is only fast because it returns the same game everytime and so it stays in cache 
     //can maybe be moved to before the menu loop and after every gameover state                
-    char* text = calloc(1,50);
+    char* id = calloc(1,21); 
+    char* passwd = calloc(1,21);
     switch (menu->type){  
 
         case INIT_MENU:
         switch (menu->selection){
             case A_CONFIRMED: // Login
-                text_input(renderer,menu,text);
+                username_input(renderer,menu,id,passwd);
                 break;
             case B_CONFIRMED: // Signup
                 // TODO
@@ -455,7 +456,9 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
                 //record_stats(game);
                 break;
             case B_CONFIRMED: // Logout
-                // TODO
+                menu->user_id[0] = 0;
+                menu->type = INIT_MENU;
+                menu->selection = NO_SELECTION;
                 break;
             case C_CONFIRMED: // Show instructions
                 // TODO
@@ -483,7 +486,9 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
                 game_loop(renderer, game, menu);
                 break;
             case B_CONFIRMED: // Logout
-                // TODO
+                menu->user_id[0] = 0;
+                menu->type = INIT_MENU;
+                menu->selection = NO_SELECTION;
                 break;
             case C_CONFIRMED: // Show instructions
                 // TODO

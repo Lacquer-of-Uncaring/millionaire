@@ -5,6 +5,7 @@
 
 #define MENU_BG "resources/menu.png"
 #define RUNNING_BG "resources/BG.png"
+#define CRED_SCREEN "resources/login.png"
 
 #define H_SCREEN "resources/100.png"
 #define TWOH_SCREEN "resources/200.png"
@@ -32,6 +33,6 @@
 void render_game(SDL_Renderer *renderer, game_t *game, int* animate, int* walk_away);
 void render_menu(SDL_Renderer* renderer, menu_t *menu);
 void render_stats(SDL_Renderer* renderer, stats* global_stats);
-void render_text_input(SDL_Renderer* renderer, char* text);
+void render_text_input(SDL_Renderer* renderer, char* text, char* hidden, int level);
 
 #endif  // RENDERING_H_
