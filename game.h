@@ -58,6 +58,16 @@ typedef struct _n{
 } node;
 
 typedef struct {
+    int top_score;
+    char top_score_holder[20];
+    int number_of_users;
+    int correct_answers;
+    int lifeline_50_uses;
+    int lifeline_25_uses;
+    int lifeline_switch_uses;
+} stats;
+
+typedef struct {
     char* m_ans_a;
     char* m_ans_b;
     char* m_ans_c;
@@ -69,6 +79,7 @@ typedef struct {
     int state;
     int selection;
     int type;
+    char user_id[20];
 } menu_t;
 
 typedef struct {
@@ -82,7 +93,7 @@ typedef struct {
 } question;
 
 typedef struct {
-	// user* player; 
+	char player_id[20]; 
     question questions[15]; 
     question switch_questions[15];
     int selection;
@@ -96,6 +107,9 @@ typedef struct {
     int lifeline_switch;
     int question_number;
     int timer;
+    int score;
+    int top_score;
+    int top_score_changed;
 } game_t;
 
 #endif  // GAME_H_

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
@@ -37,13 +38,16 @@ int main(int argc, char *argv[])
         printf("error creating renderer: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
-
+    
     // Root user initialisation
     user_t root = {
         .id = "root",
         .password = "root",
         .admin = 1
     };
+
+    // Current user
+    user_t current_user; 
 
     node head = {&root, NULL};
     //load_users(&head);
@@ -92,8 +96,11 @@ int main(int argc, char *argv[])
         .question = {init_menu,user_menu,admin_menu,admin_ops},
         .state = RUNNING,
         .selection = NO_SELECTION,
-        .type = ADMIN_MENU
-    };  
+        .type = INIT_MENU,
+        .user_id = ""
+    };
+
+    game_t* game = game_init(&menu);
 
     int x, y;
 
@@ -158,21 +165,12 @@ int main(int argc, char *argv[])
         render_menu(renderer, &menu);
         SDL_RenderPresent(renderer);
 
-        check_menu_selection(renderer,&menu);
-      /*  
-        if (menu.state == CHECKING_STATE){
-            SDL_Delay(1000);
-            check_game_over_state(&menu);
-        }
-        
-        if (menu.state == RUNNING_STATE){
-            if (menu.selection > 4){
-                SDL_Delay(1000);
-                menu.state = CHECKING_STATE;
-            }
-        }
-    */
-        SDL_Delay(1000/60);
+        check_menu_selection(renderer,game,&menu);
+        // FPS
+        SDL_Delay(1000/30);
+        SDL_FlushEvent(SDL_KEYDOWN);
+        SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
+        SDL_FlushEvent(SDL_MOUSEMOTION);
     }    
     //game_t* game = game_init();
     //game_loop(renderer, game);

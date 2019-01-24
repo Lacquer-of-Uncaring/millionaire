@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
@@ -104,9 +105,65 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
         render_game(renderer, game, &animate, &walk_away);
         SDL_RenderPresent(renderer);
         
-        check_game_over_state(game, menu, &animate);
+        check_game_over_state(game, menu, &animate, &walk_away);
         // FPS
         SDL_Delay(1000/60);
-
+        SDL_FlushEvent(SDL_KEYDOWN);
+        SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
+        SDL_FlushEvent(SDL_MOUSEMOTION);
     }
 }
+
+void text_input(SDL_Renderer* renderer, menu_t* menu, char* text){
+    int done = 0;
+    SDL_StartTextInput();
+    while (!done) {
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    /* Quit */
+                    done = 1;
+                    menu->state = QUIT;
+                    break;
+                case SDL_TEXTINPUT:
+                    /* Add new text onto the end of our text */
+                    strcat(text, e.text.text);
+                    break;
+                case SDL_TEXTEDITING:
+                    /*
+                    Update the composition text.
+                    Update the cursor position.
+                    Update the selection length (if any).
+                    
+                    composition = e.edit.text;
+                    cursor = e.edit.start;
+                    selection_len = e.edit.length;
+                    */
+                    break;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        render_text_input(renderer,text);
+        SDL_RenderPresent(renderer);
+    
+        SDL_Delay(1000/60);
+    }
+}
+
+// User logic
+
+node* user_search(node* head, char* id){
+    // Base case 
+    if (head == NULL) 
+        return NULL; 
+      
+    // If id is in node
+    if (!strcmp(head->user->id, id))
+        return head; 
+  
+    // Recur for remaining list 
+    return user_search(head->next, id);
+}
+

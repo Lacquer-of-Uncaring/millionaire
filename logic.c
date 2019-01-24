@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
@@ -7,6 +8,7 @@
 #include "game.h"
 #include "logic.h"
 #include "menu-items.h"
+#include "rendering.h"
 
 int box_a_x = 65;
 int box_a_y = 325;
@@ -19,8 +21,157 @@ int box_d_y = 395;
 int box_w = 215;
 int box_h = 55;
 
+int check_answer(game_t *game){
+    question current_q = game->questions[game->question_number-1];
+    if (current_q.correct == game->selection)
+        return 1;
+    return 0;
+}
 
-game_t* game_init(){
+int game_score(game_t* game, int* walk_away){
+    if (*walk_away){    
+        switch (game->question_number) {
+        case 1:
+            return 0;
+            break;
+        case 2:
+            return 100;
+            break;
+
+        case 3:
+            return 200;
+            break;
+
+        case 4:
+            return 300;
+            break;
+
+        case 5:
+            return 500;
+            break;
+
+        case 6:
+            return 1000;
+            break;
+        
+        case 7:
+            return 2000;
+            break;
+        
+        case 8:
+            return 4000;
+            break;
+        
+        case 9:
+            return 8000;
+            break;
+        
+        case 10:
+            return 16000;
+            break;
+        
+        case 11:
+            return 32000;
+            break;
+        
+        case 12:
+            return 64000;
+            break;
+        
+        case 13:
+            return 125000;
+            break;
+        
+        case 14:
+            return 250000;
+            break;
+        
+        case 15:
+            return 500000;
+            break;
+           
+        default: {}
+        }
+    } else {
+        if (game->question_number < CHECKPOINT_1){
+            return 0;
+        } else if (game->question_number < CHECKPOINT_2){
+            return 100;
+        } else if (game->question_number < CHECKPOINT_3){
+            return 1000;
+        } else if (game->question_number < 15){
+            return 32000;
+        } else if (game->question_number == 15 && !check_answer(game)){
+            return 32000;
+        } else {
+            return 1000000;
+        }
+    }
+}
+
+stats* fetch_stats(){
+    stats* global_stats = malloc(sizeof(stats));
+    FILE* stat_file = fopen("records/stats", "r");
+    char top_score[20];
+    char top_score_holder[20];
+    char number_of_users[20];
+    char correct_answers[20];
+    char lifeline_50_uses[20];
+    char lifeline_25_uses[20];
+    char lifeline_switch_uses[20];
+    
+    fscanf(stat_file,"%s",top_score);
+    fscanf(stat_file,"%s",top_score_holder);
+    fscanf(stat_file,"%s",number_of_users);
+    fscanf(stat_file,"%s",correct_answers);
+    fscanf(stat_file,"%s",lifeline_50_uses);
+    fscanf(stat_file,"%s",lifeline_25_uses);
+    fscanf(stat_file,"%s",lifeline_switch_uses);
+
+    global_stats->top_score = atoi(top_score);
+    strcpy(global_stats->top_score_holder, top_score_holder);
+    global_stats->number_of_users = atoi(number_of_users);
+    global_stats->correct_answers = atoi(correct_answers);
+    global_stats->lifeline_50_uses = atoi(lifeline_50_uses);
+    global_stats->lifeline_25_uses = atoi(lifeline_25_uses);
+    global_stats->lifeline_switch_uses = atoi(lifeline_switch_uses);
+
+    fclose(stat_file);
+    return global_stats;
+}
+
+void record_game_stats(game_t* game){
+    stats* global_stats = fetch_stats();
+    
+    if (game->top_score_changed){
+        global_stats->top_score = game->top_score;
+        strcpy(global_stats->top_score_holder, game->player_id);
+    }
+
+    if (game->question_number < 15 || (game->question_number == 15 && !check_answer(game)))
+        global_stats->correct_answers += game->question_number-1;
+    else 
+        global_stats->correct_answers += game->question_number; // += 15
+
+    if (!game->lifeline_50)
+        global_stats->lifeline_50_uses++;
+    if (!game->lifeline_25)
+        global_stats->lifeline_25_uses++;
+    if (!game->lifeline_switch)
+        global_stats->lifeline_switch_uses++;
+
+    FILE* stat_file = fopen("records/stats", "w");
+    fprintf(stat_file,"%d %s %d %d %d %d %d",global_stats->top_score
+                                            ,global_stats->top_score_holder
+                                            ,global_stats->number_of_users
+                                            ,global_stats->correct_answers
+                                            ,global_stats->lifeline_50_uses
+                                            ,global_stats->lifeline_25_uses
+                                            ,global_stats->lifeline_switch_uses);
+    fclose(stat_file);
+}
+
+game_t* game_init(menu_t* menu){
     char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
     char *ANS = "ICELAND";
     char *swi = "this is a switch question?";
@@ -34,6 +185,9 @@ game_t* game_init(){
         game->questions[i] = test;
         game->switch_questions[i] = tests;
     }
+
+    stats* global_stats = fetch_stats();
+    strcpy(game->player_id, menu->user_id);
     game->selection = NO_SELECTION;
     game->A_available = 1;
     game->B_available = 1;
@@ -45,17 +199,12 @@ game_t* game_init(){
     game->state = RUNNING_STATE;
     game->question_number = 1;
     game->timer = FIRST_COUNTDOWN;
-    
+    game->score = 0;
+    game->top_score = global_stats->top_score;
+    game->top_score_changed = 0;
+
     return game;   
 } 
-
-
-int check_answer(game_t *game){
-    question current_q = game->questions[game->question_number-1];
-    if (current_q.correct == game->selection)
-        return 1;
-    return 0;
-}
 
 void answer_confirm(game_t *game){
     if (game->state == RUNNING_STATE){
@@ -81,9 +230,16 @@ void next_question(game_t* game, int* animate){
     *animate = 1;
 }
 
-void check_game_over_state(game_t *game, menu_t* menu, int* animate){
+void check_game_over_state(game_t *game, menu_t* menu, int* animate, int* walk_away){
     // Go back to menu when a key or a mouse button is pressed
     if (game->state == GAME_OVER_STATE){
+        game->score = game_score(game,walk_away);
+        // Update top score
+        if (game->score > game->top_score){
+            game->top_score = game->score;
+            game->top_score_changed = 1;
+        }
+
         SDL_Event e;
         do{
             SDL_WaitEvent(&e);
@@ -91,6 +247,8 @@ void check_game_over_state(game_t *game, menu_t* menu, int* animate){
         game->state = QUIT_STATE;
         menu->state = RUNNING;
         menu->selection = NO_SELECTION;
+        record_game_stats(game);
+        //game = game_init(menu);
     }   
     // Check answer
     if (game->state == CHECKING_STATE){
@@ -231,23 +389,6 @@ void use_lifeline_switch(game_t* game, int* animate){
     }
 }
 
-// User logic
-
-node* user_search(node* head, char* id){
-    // Base case 
-    if (head == NULL) 
-        return NULL; 
-      
-    // If id is in node
-    if (!strcmp(head->user->id, id))
-        return head; 
-  
-    // Recur for remaining list 
-    return user_search(head->next, id);
-}
-
-
-
 
 // Menu logic
 
@@ -275,15 +416,16 @@ void menu_hover_select(menu_t* menu, int x, int y){
 }
 
 
-void check_menu_selection(SDL_Renderer* renderer, menu_t* menu){
-    game_t* game = game_init(); // This is only fast because it returns 
-                                // the same game everytime and so it stays in cache
+void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
+    game = game_init(menu); // This is only fast because it returns the same game everytime and so it stays in cache 
+    //can maybe be moved to before the menu loop and after every gameover state                
+    char* text = calloc(1,50);
     switch (menu->type){  
 
         case INIT_MENU:
         switch (menu->selection){
             case A_CONFIRMED: // Login
-                // TODO
+                text_input(renderer,menu,text);
                 break;
             case B_CONFIRMED: // Signup
                 // TODO
@@ -292,7 +434,16 @@ void check_menu_selection(SDL_Renderer* renderer, menu_t* menu){
                 // TODO
                 break;
             case D_CONFIRMED: // Show stats
-                // TODO
+                SDL_RenderClear(renderer);
+                stats* global_stats = fetch_stats();
+                render_stats(renderer,global_stats);
+                SDL_RenderPresent(renderer);
+                SDL_Event e;
+                do{
+                    SDL_WaitEvent(&e);
+                } while(e.type != SDL_KEYDOWN && e.type != SDL_MOUSEBUTTONDOWN);
+                menu->state = RUNNING;
+                menu->selection = NO_SELECTION;
                 break;
             }
             break;
@@ -301,6 +452,7 @@ void check_menu_selection(SDL_Renderer* renderer, menu_t* menu){
         switch (menu->selection){
             case A_CONFIRMED: // Start game
                 game_loop(renderer, game, menu);
+                //record_stats(game);
                 break;
             case B_CONFIRMED: // Logout
                 // TODO
@@ -309,7 +461,17 @@ void check_menu_selection(SDL_Renderer* renderer, menu_t* menu){
                 // TODO
                 break;
             case D_CONFIRMED: // Show stats
-                // TODO
+                SDL_RenderClear(renderer);
+                stats* global_stats = fetch_stats();
+                render_stats(renderer,global_stats);
+                SDL_RenderPresent(renderer);
+                SDL_Event e;
+                do{
+                    SDL_WaitEvent(&e);
+                } while(e.type != SDL_KEYDOWN && e.type != SDL_MOUSEBUTTONDOWN);
+                menu->state = RUNNING;
+                menu->selection = NO_SELECTION;
+                break;
                 break;
             }
 
@@ -327,7 +489,17 @@ void check_menu_selection(SDL_Renderer* renderer, menu_t* menu){
                 // TODO
                 break;
             case D_CONFIRMED: // Show stats
-                // TODO
+                SDL_RenderClear(renderer);
+                stats* global_stats = fetch_stats();
+                render_stats(renderer,global_stats);
+                SDL_RenderPresent(renderer);
+                SDL_Event e;
+                do{
+                    SDL_WaitEvent(&e);
+                } while(e.type != SDL_KEYDOWN && e.type != SDL_MOUSEBUTTONDOWN);
+                menu->state = RUNNING;
+                menu->selection = NO_SELECTION;
+                break;
                 break;
             }
             break;

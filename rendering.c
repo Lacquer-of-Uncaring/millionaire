@@ -196,7 +196,48 @@ void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const
 void render_money(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name){
     TTF_Init();
     TTF_Font * font = TTF_OpenFont(font_name, 17);
-   
+
+    
+    SDL_Rect dest;
+    dest.x = x;
+    dest.y = y;
+
+    SDL_Surface * surface = TTF_RenderText_Blended(font, text, white);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+
+    TTF_CloseFont(font);
+    TTF_Quit();
+}
+
+void render_25(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name){
+    TTF_Init();
+    TTF_Font * font = TTF_OpenFont(font_name, 25);
+
+    
+    SDL_Rect dest;
+    dest.x = x;
+    dest.y = y;
+
+    SDL_Surface * surface = TTF_RenderText_Blended(font, text, white);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+
+    TTF_CloseFont(font);
+    TTF_Quit();
+}
+
+void render_20(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name){
+    TTF_Init();
+    TTF_Font * font = TTF_OpenFont(font_name, 25);
+
+    
     SDL_Rect dest;
     dest.x = x;
     dest.y = y;
@@ -542,7 +583,54 @@ switch(menu->selection){
 
     }
     render_screen(renderer, MENU_BG);
+    render_money(renderer, 10, 5, menu->user_id, DEFAULT_FONT);
     if (menu->type == ADMIN_MENU)
         render_answer(renderer, 440, 455, "Press R for admin options", DEFAULT_FONT);
     render_opts(renderer, menu);
+}
+
+void render_stats(SDL_Renderer* renderer, stats* global_stats){
+    render_answer(renderer, 450, 455, "Press any key to go back", DEFAULT_FONT);
+    FILE* stat_file = fopen("records/stats", "r");
+    char top_score[20];
+    char top_score_holder[20];
+    char number_of_users[20];
+    char correct_answers[20];
+    char lifeline_50_uses[20];
+    char lifeline_25_uses[20];
+    char lifeline_switch_uses[20];
+    
+    fscanf(stat_file,"%s",top_score);
+    fscanf(stat_file,"%s",top_score_holder);
+    fscanf(stat_file,"%s",number_of_users);
+    fscanf(stat_file,"%s",correct_answers);
+    fscanf(stat_file,"%s",lifeline_50_uses);
+    fscanf(stat_file,"%s",lifeline_25_uses);
+    fscanf(stat_file,"%s",lifeline_switch_uses);
+    fclose(stat_file);
+
+    render_25(renderer, 150, 100 - 25, "Top Score : ", DEFAULT_FONT);
+    render_25(renderer, 400, 100 - 25, top_score, DEFAULT_FONT);
+
+    render_25(renderer, 150, 150 - 25, "Held By : ", DEFAULT_FONT);
+    render_25(renderer, 400, 150 - 25, top_score_holder, DEFAULT_FONT);
+    
+    render_25(renderer, 150, 200 - 25, "Number of users : ", DEFAULT_FONT);
+    render_25(renderer, 400, 200 - 25, number_of_users, DEFAULT_FONT);
+    
+    render_25(renderer, 150, 250 - 25, "Correct answers : ", DEFAULT_FONT);
+    render_25(renderer, 400, 250 - 25, correct_answers, DEFAULT_FONT);
+    
+    render_25(renderer, 150, 300 - 25, "50s used : ", DEFAULT_FONT);
+    render_25(renderer, 400, 300 - 25, lifeline_50_uses, DEFAULT_FONT);
+    
+    render_25(renderer, 150, 350 - 25, "25s used : ", DEFAULT_FONT);
+    render_25(renderer, 400, 350 - 25, lifeline_25_uses, DEFAULT_FONT);
+    
+    render_25(renderer, 150, 400 - 25, "Switches used: ", DEFAULT_FONT);
+    render_25(renderer, 400, 400 - 25, lifeline_switch_uses, DEFAULT_FONT);
+}
+
+void render_text_input(SDL_Renderer* renderer, char* text){
+    render_25(renderer, 320, 240, text, DEFAULT_FONT);
 }
