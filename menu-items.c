@@ -42,21 +42,52 @@ int compare(node *one , node *two){
 return strcmp(one->user->id, two->user->id);
 }
 
-void user_add(node **pp, char* id, char* passwd, int (*cmp)(node *l, node *r)) {
+int user_add(node **pp, char* id, char* passwd, int admin) {
     node* new = malloc(sizeof(node));
     user_t* user = malloc(sizeof(user_t));
     new->user = user;
     strcpy(new->user->id,id);
     strcpy(new->user->password,passwd);
-    new->user->admin = 0;
+    new->user->admin = admin;
 
     for ( ; *pp != NULL; pp = &(*pp)->next) {
-        if (cmp(*pp, new) > 0 )
-            break;
-        }
+        if (!strcmp((*pp)->user->id,id))
+            return 1;
+    }
 
     new->next = *pp;
     *pp = new;
+    return 0;
+}
+
+void fetch_users(node* head){
+    FILE* user_file = fopen("records/users", "r");
+    char id[20];
+    char password[20];
+    int admin;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getline(&line, &len, user_file)) != -1) {
+        sscanf(line,"%s %s %d",id,password,&admin);
+        user_add(&head,id,password,admin);
+    }
+
+    fclose(user_file);
+    if (line)
+        free(line);
+}
+
+void record_users(node* head){
+    node* current = head;
+    FILE* user_file = fopen("records/users", "w");
+    while(current != NULL){
+        if (strcmp(current->user->id,"root"))
+            fprintf(user_file, "%s %s %d\n",current->user->id,current->user->password,current->user->admin);
+        current = current->next;
+    }
+    fclose(user_file);
 }
 
 void passwd_input(SDL_Renderer* renderer, menu_t* menu, user_t* username, char* id, char* passwd, int* success){
@@ -221,6 +252,7 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
 }
 
 void username_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd){
+    fetch_users(&head);
     int done = 0;
     int level = 0;
     int success = 0;
@@ -304,7 +336,8 @@ void signup_passwd_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* p
                     case SDL_SCANCODE_RETURN:
                         if (strlen(passwd)){
                             // Successful signup!
-                            user_add(&list_root,id,passwd,compare);                            
+                            user_add(&list_root,id,passwd,0);
+                            record_users(&head);                          
                             menu->selection = NO_SELECTION;
                             *success = 1;
                             done = 1;
@@ -328,6 +361,7 @@ void signup_passwd_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* p
 }
 
 void signup_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd){
+    fetch_users(&head);
     int done = 0;
     int level = 0;
     int success = 0;
