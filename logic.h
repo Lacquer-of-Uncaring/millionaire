@@ -2,6 +2,7 @@
 #define LOGIC_H_
 
 stats* fetch_stats();
+void increment_user_number();
 game_t* game_init();
 void answer_confirm(game_t *game);
 void check_game_over_state(game_t *game, menu_t* menu, int* animate, int *walk_away);

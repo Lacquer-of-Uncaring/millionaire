@@ -171,6 +171,34 @@ void record_game_stats(game_t* game){
     fclose(stat_file);
 }
 
+void increment_user_number(){
+    stats* global_stats = fetch_stats();
+    global_stats->number_of_users++;
+    FILE* stat_file = fopen("records/stats", "w");
+    fprintf(stat_file,"%d %s %d %d %d %d %d",global_stats->top_score
+                                            ,global_stats->top_score_holder
+                                            ,global_stats->number_of_users
+                                            ,global_stats->correct_answers
+                                            ,global_stats->lifeline_50_uses
+                                            ,global_stats->lifeline_25_uses
+                                            ,global_stats->lifeline_switch_uses);
+    fclose(stat_file);
+}
+
+void decrement_user_number(){
+    stats* global_stats = fetch_stats();
+    global_stats->number_of_users--;
+    FILE* stat_file = fopen("records/stats", "w");
+    fprintf(stat_file,"%d %s %d %d %d %d %d",global_stats->top_score
+                                            ,global_stats->top_score_holder
+                                            ,global_stats->number_of_users
+                                            ,global_stats->correct_answers
+                                            ,global_stats->lifeline_50_uses
+                                            ,global_stats->lifeline_25_uses
+                                            ,global_stats->lifeline_switch_uses);
+    fclose(stat_file);
+}
+
 game_t* game_init(menu_t* menu){
     char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
     char *ANS = "ICELAND";
@@ -421,6 +449,7 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
     //can maybe be moved to before the menu loop and after every gameover state                
     char* id = calloc(1,21); 
     char* passwd = calloc(1,21);
+    char* confirm = calloc(1,21);
     switch (menu->type){  
 
         case INIT_MENU:
@@ -512,7 +541,7 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
         case ADMIN_OPS:
         switch (menu->selection){
             case A_CONFIRMED: // Delete an account
-                // TODO
+                admin_input(renderer,menu,id,confirm);
                 break;
             case B_CONFIRMED: // Grant admin rights
                 // TODO

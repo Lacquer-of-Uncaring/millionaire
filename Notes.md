@@ -48,3 +48,8 @@ Admin Menu :
 * 3 question files one for each diff (ascii)
 * file for user data (bin)
 * file for stats (?)
+
+
+
+## Instrutions
+This is who wants to be a millionaire! Test your knowledge by attempting to answer all 15 answers

@@ -674,3 +674,23 @@ void render_text_input(SDL_Renderer* renderer, char* text, char* hidden, int lev
     render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT);
 
 }
+
+void render_confirm_input(SDL_Renderer* renderer, char* text, char* confirm, int level){
+    render_25_centered(renderer, 320, 270, confirm, DEFAULT_FONT);
+    render_25_centered(renderer, 320, 173, text, DEFAULT_FONT);
+    render_screen(renderer, CRED_SCREEN);
+    render_money(renderer, 275, 130, "Username : ", DEFAULT_FONT);
+    render_money(renderer, 285, 225, "Confirm : ", DEFAULT_FONT);
+    // Indicators
+    if (level == 0){
+        render_25(renderer, 150, 173, "O", DEFAULT_FONT);
+        render_25(renderer, 470, 173, "O", DEFAULT_FONT);
+    }
+
+    else{
+        render_25(renderer, 150, 270, "O", DEFAULT_FONT);
+        render_25(renderer, 470, 270, "O", DEFAULT_FONT);
+    }
+    render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT);
+
+}
