@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     char* instructions = "INSTRUCTIONS";
     char* logout = "LOGOUT";
     char* del = "DELETE ACCOUNT";
-    char* grant = "GRANT ADMIN";
+    char* grant = "TOGGLE ADMIN";
     char* add = "ADD QUESTION";
     char* back = "BACK";
 

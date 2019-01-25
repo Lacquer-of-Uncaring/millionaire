@@ -28,18 +28,16 @@ node* list_root = &head;
 node* user_search(node* head, char* id){
     // Base case 
     if (head == NULL) 
-        return NULL; 
-      
+        return NULL;      
     // If id is in node
     if (!strcmp(head->user->id, id))
-        return head; 
-  
+        return head;  
     // Recur for remaining list 
     return user_search(head->next, id);
 }
 
 int compare(node *one , node *two){
-return strcmp(one->user->id, two->user->id);
+    return strcmp(one->user->id, two->user->id);
 }
 
 int user_add(node **pp, char* id, char* passwd, int admin) {
@@ -527,6 +525,118 @@ void admin_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* confirm){
                         }
                         else
                             confirm_admin_input(renderer,menu,username->user,id,confirm,&success);
+                        break;
+                    }
+                    break;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        render_confirm_input(renderer,id,confirm,level);
+        SDL_RenderPresent(renderer);
+    
+        SDL_Delay(1000/60);
+    }
+    menu->selection = NO_SELECTION;
+}
+
+void confirm_rights_input(SDL_Renderer* renderer, menu_t* menu, user_t* username, char* id, char* confirm, int* success){
+    int done = 0;
+    int level = 1;
+    SDL_StartTextInput();
+    while (!done) {
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    /* Quit */
+                    done = 1;
+                    menu->state = QUIT;
+                    break;
+                case SDL_TEXTINPUT:
+                    /* Add new id onto the end of our id */
+                    if (strlen(confirm) < 20)
+                        strcat(confirm, e.text.text);
+                    break;
+                case SDL_KEYDOWN:
+                    switch (e.key.keysym.scancode){ 
+                    case SDL_SCANCODE_ESCAPE:
+                        //confirm = calloc(1,21);
+                        confirm[0] = 0;
+                        done = 1;
+                        break;
+                    case SDL_SCANCODE_BACKSPACE:
+                        confirm[strlen(confirm)-1] = 0;
+                        break;
+                    case SDL_SCANCODE_RETURN:
+                        if (!strcmp(username->id, confirm)){
+                            // Successful confirm!
+                            if (username->admin)
+                                username->admin = 0;
+                            else
+                                username->admin = 1;
+                            record_users(&head);
+                            menu->selection = NO_SELECTION;
+                            *success = 1;
+                            done = 1;
+                        }
+                        else{
+                            confirm[0] = 0;
+                        }
+                            
+                        break;
+                    }
+                    break;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        render_confirm_input(renderer,id,confirm,level);
+        SDL_RenderPresent(renderer);
+    
+        SDL_Delay(1000/60);
+    }
+}
+
+void rights_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* confirm){
+    fetch_users(&head);
+    int done = 0;
+    int level = 0;
+    int success = 0;
+    node* username;
+    SDL_StartTextInput();
+    while (!done && !success) {
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    /* Quit */
+                    done = 1;
+                    menu->state = QUIT;
+                    break;
+                case SDL_TEXTINPUT:
+                    /* Add new id onto the end of our id */
+                    if (strlen(id) < 20)
+                        strcat(id, e.text.text);
+                    break;
+                case SDL_KEYDOWN:
+                    switch (e.key.keysym.scancode){ 
+                    case SDL_SCANCODE_ESCAPE:
+                        done = 1;
+                        id = calloc(1,21);
+                        menu->selection = NO_SELECTION;
+                        break;
+                    case SDL_SCANCODE_BACKSPACE:
+                        id[strlen(id)-1] = 0;
+                        break;
+                    case SDL_SCANCODE_RETURN:
+                        username = user_search(&head,id);
+                        // can't delete root or your account
+                        if (username == NULL || !strcmp(username->user->id,"root") || !strcmp(username->user->id,menu->user_id)){
+                            id = calloc(1,21);
+                        }
+                        else
+                            confirm_rights_input(renderer,menu,username->user,id,confirm,&success);
                         break;
                     }
                     break;

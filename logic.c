@@ -544,7 +544,7 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
                 admin_input(renderer,menu,id,confirm);
                 break;
             case B_CONFIRMED: // Grant admin rights
-                // TODO
+                rights_input(renderer,menu,id,confirm);
                 break;
             case C_CONFIRMED: // Add a question
                 // TODO
