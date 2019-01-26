@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+#include <unistd.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
@@ -20,6 +22,29 @@ int box_d_x = 350;
 int box_d_y = 395;
 int box_w = 215;
 int box_h = 55;
+
+void shuffle(int *array, size_t n){
+    if (n > 1){
+        size_t i;
+        for (i = 0; i < n - 1; i++){
+            srand( time(0)+clock()+rand()+getpid() );
+            size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+            int t = array[j];
+            array[j] = array[i];
+            array[i] = t;
+        }
+    }
+}
+
+int* random_different_numbers(){
+    int array[10] = {1,2,3,4,5,6,7,8,9,10};
+    srand( time(0)+clock()+rand() );
+    shuffle(array,10);
+    int* ret = malloc(6*sizeof(int));
+    for (int i=0; i<6; i++)
+        ret[i] = array[i];
+    return ret;
+}
 
 int check_answer(game_t *game){
     question current_q = game->questions[game->question_number-1];
@@ -199,20 +224,195 @@ void decrement_user_number(){
     fclose(stat_file);
 }
 
+question* nth_question(int n, const char* path){
+    FILE* fp = fopen(path,"r");
+    question* ret = malloc(sizeof(question));
+    int count = 1;
+    ret->text = malloc(100);
+    ret->ans_a = malloc(30);
+    ret->ans_b = malloc(30);
+    ret->ans_c = malloc(30);
+    ret->ans_d = malloc(30);
+    ret->correct = A_CORRECT;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int target = (n-1)*5 + 1;
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        if (count == target){  
+          sscanf(line,"%[^\n]s",ret->text);
+          getline(&line, &len, fp);
+          sscanf(line,"%[^\n]s",ret->ans_a);
+          getline(&line, &len, fp);
+          sscanf(line,"%[^\n]s",ret->ans_b);
+          getline(&line, &len, fp);
+          sscanf(line,"%[^\n]s",ret->ans_c);
+          getline(&line, &len, fp);
+          sscanf(line,"%[^\n]s",ret->ans_d);
+          return ret;
+        }
+        else{
+          count++;
+        }
+    }
+    fclose(fp);
+    if (line)
+        free(line);
+}
+
+question* scramble_answers(question* org){
+  int trans[4] = {0,1,2,3};
+  srand( time(0)+clock()+rand() );
+  shuffle(trans,4);
+  question* ret = malloc(sizeof(question));
+  ret->text = malloc(100);
+  ret->ans_a = malloc(30);
+  ret->ans_b = malloc(30);
+  ret->ans_c = malloc(30);
+  ret->ans_d = malloc(30);
+  ret->text = org->text;
+  for (int i=0; i<4; i++){
+    switch (i){
+      case 0:
+        switch (trans[i]){
+          case 0:
+            ret->ans_a = org->ans_a;
+            ret->correct = A_CORRECT;
+            break;
+          case 1:
+            ret->ans_a = org->ans_b;
+            break;
+          case 2:
+            ret->ans_a = org->ans_c;
+            break;
+          case 3:
+            ret->ans_a = org->ans_d;
+            break;
+          default : {}
+        }
+        break;
+      case 1:
+        switch (trans[i]){
+          case 0:
+            ret->ans_b = org->ans_a;
+            ret->correct = B_CORRECT;
+            break;
+          case 1:
+            ret->ans_b = org->ans_b;
+            break;
+          case 2:
+            ret->ans_b = org->ans_c;
+            break;
+          case 3:
+            ret->ans_b = org->ans_d;
+            break;
+          default : {}
+        }
+        break;
+      case 2:
+        switch (trans[i]){
+          case 0:
+            ret->ans_c = org->ans_a;
+            ret->correct = C_CORRECT;
+            break;
+          case 1:
+            ret->ans_c = org->ans_b;
+            break;
+          case 2:
+            ret->ans_c = org->ans_c;
+            break;
+          case 3:
+            ret->ans_c = org->ans_d;
+            break;
+          default : {}
+        }
+        break;
+      case 3:
+        switch (trans[i]){
+          case 0:
+            ret->ans_d = org->ans_a;
+            ret->correct = D_CORRECT;
+            break;
+          case 1:
+            ret->ans_d = org->ans_b;
+            break;
+          case 2:
+            ret->ans_d = org->ans_c;
+            break;
+          case 3:
+            ret->ans_d = org->ans_d;
+            break;
+          default : {}
+        }
+        break;
+      default : {}
+    }
+  }
+}
+
 game_t* game_init(menu_t* menu){
-    char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
+    
+/*char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
     char *ANS = "ICELAND";
     char *swi = "this is a switch question?";
     char *ans = "lol";
-
     question test = {SAMPLETEXT, ANS, ANS, ANS, ANS, A_CORRECT};
     question tests = {swi, ans, ans, ans, ans, B_CORRECT};
-
+    FILE* lvl1 = fopen("records/lvl1","r");
     game_t* game = malloc(sizeof(game_t));
+
     for (int i=0; i<15; i++){
         game->questions[i] = test;
         game->switch_questions[i] = tests;
     }
+*/  
+
+    srand( time(0)+clock()+rand() );
+    question* org;
+    question* ret;
+    game_t* game = malloc(sizeof(game_t));
+    int* r = random_different_numbers();
+    for (int i=0; i<5; i++){
+        org = nth_question(r[i],"records/lvl1");
+        ret = scramble_answers(org);
+        game->questions[i] = *ret;
+        free(org);
+        free(ret);
+    }
+    org = nth_question(r[5],"records/lvl1");
+    ret = scramble_answers(org);
+    game->switch_questions[0] = *ret;
+    free(org);
+    free(ret);
+
+    r = random_different_numbers();
+    for (int i=0; i<5; i++){
+        org = nth_question(r[i],"records/lvl2");
+        ret = scramble_answers(org);
+        game->questions[i+5] = *ret;
+        free(org);
+        free(ret);
+    }
+    org = nth_question(r[5],"records/lvl2");
+    ret = scramble_answers(org);
+    game->switch_questions[1] = *ret;
+    free(org);
+    free(ret);
+
+    r = random_different_numbers();
+    for (int i=0; i<5; i++){
+        org = nth_question(r[i],"records/lvl3");
+        ret = scramble_answers(org);
+        game->questions[i+10] = *ret;
+        free(org);
+        free(ret);
+    }
+    org = nth_question(r[5],"records/lvl3");
+    ret = scramble_answers(org);
+    game->switch_questions[2] = *ret;
+    free(org);
+    free(ret);
 
     stats* global_stats = fetch_stats();
     strcpy(game->player_id, menu->user_id);
@@ -276,6 +476,7 @@ void check_game_over_state(game_t *game, menu_t* menu, int* animate, int* walk_a
         menu->state = RUNNING;
         menu->selection = NO_SELECTION;
         record_game_stats(game);
+        srand( time(0)+clock()+rand() );
         //game = game_init(menu);
     }   
     // Check answer
@@ -388,7 +589,13 @@ void use_lifeline_25(game_t* game){
 void use_lifeline_switch(game_t* game, int* animate){
     if (game->lifeline_switch && game->state == RUNNING_STATE && game->selection < 5){
         question *current_q = &game->questions[game->question_number-1];
-        question *switch_q = &game->switch_questions[game->question_number-1];
+        question *switch_q;
+        if (game->question_number < 6)
+            switch_q = &game->switch_questions[0];
+        else if (game->question_number < 11)
+            switch_q = &game->switch_questions[1];
+        else
+            switch_q = &game->switch_questions[2];
         current_q->text = malloc(strlen(switch_q->text) + 1);
         strcpy(current_q->text,switch_q->text);
         current_q->ans_a = malloc(strlen(switch_q->ans_a) + 1);
@@ -445,8 +652,22 @@ void menu_hover_select(menu_t* menu, int x, int y){
 
 
 void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
-    game = game_init(menu); // This is only fast because it returns the same game everytime and so it stays in cache 
-    //can maybe be moved to before the menu loop and after every gameover state                
+    stats* global_stats = fetch_stats();
+    game->selection = NO_SELECTION;
+    game->A_available = 1;
+    game->B_available = 1;
+    game->C_available = 1;
+    game->D_available = 1;
+    game->lifeline_50 = 1;
+    game->lifeline_25 = 1;
+    game->lifeline_switch = 1;
+    game->question_number = 1;
+    game->timer = FIRST_COUNTDOWN;
+    game->score = 0;
+    game->top_score = global_stats->top_score;
+    game->top_score_changed = 0;
+            // This is only fast because it returns the same game everytime and so it stays in cache 
+            //can maybe be moved to before the menu loop and after every gameover state                
     char* id = calloc(1,21); 
     char* passwd = calloc(1,21);
     char* confirm = calloc(1,21);
@@ -481,7 +702,9 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
         case USER_MENU:
         switch (menu->selection){
             case A_CONFIRMED: // Start game
+                game = game_init(menu);
                 game_loop(renderer, game, menu);
+                //game = game_init(menu);
                 //record_stats(game);
                 break;
             case B_CONFIRMED: // Logout
@@ -512,7 +735,9 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
         case ADMIN_MENU:
         switch (menu->selection){
             case A_CONFIRMED: // Start game
+                game = game_init(menu);
                 game_loop(renderer, game, menu);
+                //game = game_init(menu);
                 break;
             case B_CONFIRMED: // Logout
                 menu->user_id[0] = 0;

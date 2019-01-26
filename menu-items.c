@@ -168,7 +168,7 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
     int x,y;
     int animate = 1;
     int walk_away = 0;
-
+    
     // Event handling
     SDL_Event e;
     while (game->state != QUIT_STATE) {

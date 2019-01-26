@@ -95,7 +95,7 @@ typedef struct {
 typedef struct {
 	char player_id[20]; 
     question questions[15]; 
-    question switch_questions[15];
+    question switch_questions[3];
     int selection;
     int A_available;
     int B_available;

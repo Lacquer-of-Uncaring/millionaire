@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
         .user_id = ""
     };
 
-    game_t* game = game_init(&menu);
 
+    game_t* game = game_init(&menu);;
     int x, y;
 
     SDL_Event e;
