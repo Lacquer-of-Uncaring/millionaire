@@ -36,15 +36,12 @@ void shuffle(int *array, size_t n){
     }
 }
 
-int* random_different_numbers(){
-    int array[10] = {1,2,3,4,5,6,7,8,9,10};
-    srand( time(0)+clock()+rand() );
-    shuffle(array,10);
-    int* ret = malloc(6*sizeof(int));
-    for (int i=0; i<6; i++)
-        ret[i] = array[i];
-    return ret;
+void count(int *array, int n){
+    for (int i = 0; i < n; i++){
+        array[i] = i+1;
+    }
 }
+
 
 int check_answer(game_t *game){
     question current_q = game->questions[game->question_number-1];
@@ -224,6 +221,32 @@ void decrement_user_number(){
     fclose(stat_file);
 }
 
+
+int count_lines(FILE* fp){
+  int lines=0;
+  int ch = 0;
+  while(!feof(fp)){
+    ch = fgetc(fp);
+    if(ch == '\n'){
+      lines++;
+    }
+  }
+  return lines/5;
+}
+
+int* random_different_numbers(const char* path){
+    FILE* fp = fopen(path,"r");
+    int n = count_lines(fp);
+    fclose(fp);
+    int array[n];
+    count(array,n);
+    shuffle(array,n);
+    int* ret = malloc(6*sizeof(int));
+    for (int i=0; i<6; i++)
+        ret[i] = array[i];
+    return ret;
+}
+
 question* nth_question(int n, const char* path){
     FILE* fp = fopen(path,"r");
     question* ret = malloc(sizeof(question));
@@ -352,67 +375,56 @@ question* scramble_answers(question* org){
 }
 
 game_t* game_init(menu_t* menu){
-    
-/*char *SAMPLETEXT = "This is an example of my problem, for most lines it works fine, albeit it looks a bit tight. But for any letters that \"hang\" below the line.";
-    char *ANS = "ICELAND";
-    char *swi = "this is a switch question?";
-    char *ans = "lol";
-    question test = {SAMPLETEXT, ANS, ANS, ANS, ANS, A_CORRECT};
-    question tests = {swi, ans, ans, ans, ans, B_CORRECT};
-    FILE* lvl1 = fopen("records/lvl1","r");
-    game_t* game = malloc(sizeof(game_t));
 
-    for (int i=0; i<15; i++){
-        game->questions[i] = test;
-        game->switch_questions[i] = tests;
-    }
-*/  
 
     srand( time(0)+clock()+rand() );
     question* org;
     question* ret;
     game_t* game = malloc(sizeof(game_t));
-    int* r = random_different_numbers();
+    int* r1 = random_different_numbers("records/lvl1");
     for (int i=0; i<5; i++){
-        org = nth_question(r[i],"records/lvl1");
+        org = nth_question(r1[i],"records/lvl1");
         ret = scramble_answers(org);
         game->questions[i] = *ret;
         free(org);
         free(ret);
     }
-    org = nth_question(r[5],"records/lvl1");
+    org = nth_question(r1[5],"records/lvl1");
     ret = scramble_answers(org);
     game->switch_questions[0] = *ret;
     free(org);
     free(ret);
 
-    r = random_different_numbers();
+    int* r2 = random_different_numbers("records/lvl2");
     for (int i=0; i<5; i++){
-        org = nth_question(r[i],"records/lvl2");
+        org = nth_question(r2[i],"records/lvl2");
         ret = scramble_answers(org);
         game->questions[i+5] = *ret;
         free(org);
         free(ret);
     }
-    org = nth_question(r[5],"records/lvl2");
+    org = nth_question(r2[5],"records/lvl2");
     ret = scramble_answers(org);
     game->switch_questions[1] = *ret;
     free(org);
     free(ret);
 
-    r = random_different_numbers();
+    int* r3 = random_different_numbers("records/lvl3");
     for (int i=0; i<5; i++){
-        org = nth_question(r[i],"records/lvl3");
+        org = nth_question(r3[i],"records/lvl3");
         ret = scramble_answers(org);
         game->questions[i+10] = *ret;
         free(org);
         free(ret);
     }
-    org = nth_question(r[5],"records/lvl3");
+    org = nth_question(r3[5],"records/lvl3");
     ret = scramble_answers(org);
     game->switch_questions[2] = *ret;
     free(org);
     free(ret);
+    free(r1);
+    free(r2);
+    free(r3);
 
     stats* global_stats = fetch_stats();
     strcpy(game->player_id, menu->user_id);
@@ -735,7 +747,7 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
         case ADMIN_MENU:
         switch (menu->selection){
             case A_CONFIRMED: // Start game
-                game = game_init(menu);
+                game = game_init(menu);     
                 game_loop(renderer, game, menu);
                 //game = game_init(menu);
                 break;
