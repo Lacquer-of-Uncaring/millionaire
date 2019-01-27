@@ -10,6 +10,7 @@
 #include "menu-items.h"
 #include "rendering.h"
 
+
 // Root user initialisation
 user_t root = {
     .id = "root",
@@ -198,26 +199,26 @@ void game_loop(SDL_Renderer* renderer, game_t* game, menu_t* menu){
                     use_lifeline_switch(game,&animate);
                     break;
 
-                case SDL_SCANCODE_A:
+                case SDL_SCANCODE_Q:
                     // Can only select in running state and before confirming
                     if (game->state == RUNNING_STATE){
                         if (game->selection < 5 && game->A_available)
                             game->selection = A_SELECTED;
                     }
                     break;
-                case SDL_SCANCODE_B:
+                case SDL_SCANCODE_W:
                     if (game->state == RUNNING_STATE){
                         if (game->selection < 5 && game->B_available)
                             game->selection = B_SELECTED;
                     }
                     break;
-                case SDL_SCANCODE_C:
+                case SDL_SCANCODE_E:
                     if (game->state == RUNNING_STATE){
                         if (game->selection < 5 && game->C_available)
                             game->selection = C_SELECTED;
                     }
                     break;
-                case SDL_SCANCODE_D:
+                case SDL_SCANCODE_R:
                     if (game->state == RUNNING_STATE){
                         if (game->selection < 5 && game->D_available)
                             game->selection = D_SELECTED;
@@ -376,6 +377,7 @@ void signup_passwd_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* p
 }
 
 void signup_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd){
+    const SDL_Color white = { .r = 255, .g = 255, .b = 255};
     fetch_users(&head);
     int done = 0;
     int level = 0;
@@ -410,7 +412,7 @@ void signup_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd){
                         username = user_search(&head,id);
                         if (username != NULL){
                             id = calloc(1,21);
-                            render_answer(renderer, 5, 450, "Username Taken :c", DEFAULT_FONT);
+                            render_answer(renderer, 5, 450, "Username Taken :c", DEFAULT_FONT,white);
                             SDL_RenderPresent(renderer);
                             SDL_Delay(500);
                         }
@@ -464,6 +466,7 @@ void confirm_admin_input(SDL_Renderer* renderer, menu_t* menu, user_t* username,
                             // Successful deletion!
                             user_remove(&list_root,confirm);
                             record_users(&head);
+                            decrement_user_number();
                             menu->selection = NO_SELECTION;
                             *success = 1;
                             done = 1;

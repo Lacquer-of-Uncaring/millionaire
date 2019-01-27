@@ -34,6 +34,8 @@ const SDL_Color red = { .r = 230, .g = 0, .b = 0};
 const SDL_Color yellow = { .r = 250, .g = 154, .b = 20};
 const SDL_Color grey = { .r = 100, .g = 100, .b = 100};
 const SDL_Color white = { .r = 255, .g = 255, .b = 255};
+const SDL_Color orange = { .r = 255, .g = 72, .b = 0};
+
 
 SDL_Texture* load_texture(SDL_Renderer* renderer, const char* path){
     //The final texture
@@ -152,7 +154,7 @@ void render_question(SDL_Renderer* renderer, int x, int y, const char* text, con
     SDL_Rect dest;
     dest.x = x;
     dest.y = y;
-    Uint32 wrap = 460;
+    Uint32 wrap = 445;
 
     SDL_Surface * surface = TTF_RenderText_Blended_Wrapped(font, text, white, wrap);
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -165,24 +167,29 @@ void render_question(SDL_Renderer* renderer, int x, int y, const char* text, con
     TTF_Quit();
 }
 
-void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name){
+void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name, const SDL_Color color){
     TTF_Init();
     TTF_Font * font;
-    if(strlen(text) < 16)
-        font = TTF_OpenFont(font_name, 25);
-    else if (strlen(text) < 22)
-        font = TTF_OpenFont(font_name, 20);
-    else if (strlen(text) < 26)
-        font = TTF_OpenFont(font_name, 17);
-    else
-        font = TTF_OpenFont(font_name, 15);
-
-    
     SDL_Rect dest;
     dest.x = x;
     dest.y = y;
+    if(strlen(text) < 16){
+        font = TTF_OpenFont(font_name, 25);
+    }
+    else if (strlen(text) < 22){
+        font = TTF_OpenFont(font_name, 20);
+        dest.y += 4;
+    }
+    else if (strlen(text) < 26){
+        font = TTF_OpenFont(font_name, 17);
+        dest.y += 4;
+    }
+    else{
+        font = TTF_OpenFont(font_name, 15);
+        dest.y += 4;
+    }
 
-    SDL_Surface * surface = TTF_RenderText_Blended(font, text, white);
+    SDL_Surface * surface = TTF_RenderText_Blended(font, text, color);
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
     SDL_RenderCopy(renderer, texture, NULL, &dest);
@@ -277,8 +284,8 @@ void render_text(SDL_Renderer* renderer, game_t* game, int* animate){
     question current_q = game->questions[game->question_number-1];
     char q_number[3]; 
     sprintf(q_number, "%d", game->question_number);
-    render_answer(renderer, 440, 453, "Question number : ", DEFAULT_FONT);
-    render_answer(renderer, 610, 450, q_number, DEFAULT_FONT);
+    render_answer(renderer, 440, 448, "Question number : ", DEFAULT_FONT, white);
+    render_answer(renderer, 610, 450, q_number, DEFAULT_FONT, white);
     switch (game->question_number) {
         case 1:
             render_money(renderer, 5, 455, "0 DHS / 0 DHS", DEFAULT_FONT);
@@ -348,30 +355,43 @@ void render_text(SDL_Renderer* renderer, game_t* game, int* animate){
         render_question(renderer, question_x, question_y, current_q.text, DEFAULT_FONT);
         SDL_RenderPresent(renderer);
         SDL_Delay(2000);    
-        render_answer(renderer, ans_a_x, ans_a_y, current_q.ans_a, DEFAULT_FONT);
+        render_answer(renderer, ans_a_x+25, ans_a_y, current_q.ans_a, DEFAULT_FONT, white);
+        render_answer(renderer, ans_a_x, ans_a_y, "A:", DEFAULT_FONT, orange);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000);
-        render_answer(renderer, ans_b_x, ans_b_y, current_q.ans_b, DEFAULT_FONT);
+        render_answer(renderer, ans_b_x+25, ans_b_y, current_q.ans_b, DEFAULT_FONT, white);
+        render_answer(renderer, ans_b_x, ans_b_y, "B:", DEFAULT_FONT, orange);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000);    
-        render_answer(renderer, ans_c_x, ans_c_y, current_q.ans_c, DEFAULT_FONT);
+        render_answer(renderer, ans_c_x+25, ans_c_y, current_q.ans_c, DEFAULT_FONT, white);
+        render_answer(renderer, ans_c_x, ans_c_y, "C:", DEFAULT_FONT, orange);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000);
-        render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
+        render_answer(renderer, ans_d_x+25, ans_d_y, current_q.ans_d, DEFAULT_FONT, white);
+        render_answer(renderer, ans_d_x, ans_d_y, "D:", DEFAULT_FONT, orange);
         SDL_RenderPresent(renderer);
         *animate = 0;
     }
 
     else{
         render_question(renderer, question_x, question_y, current_q.text, DEFAULT_FONT);
-        if (game->A_available)
-            render_answer(renderer, ans_a_x, ans_a_y, current_q.ans_a, DEFAULT_FONT);
-        if (game->B_available)
-            render_answer(renderer, ans_b_x, ans_b_y, current_q.ans_b, DEFAULT_FONT);
-        if (game->C_available)    
-            render_answer(renderer, ans_c_x, ans_c_y, current_q.ans_c, DEFAULT_FONT);
-        if (game->D_available)
-            render_answer(renderer, ans_d_x, ans_d_y, current_q.ans_d, DEFAULT_FONT);
+        if (game->A_available){
+            render_answer(renderer, ans_a_x+25, ans_a_y, current_q.ans_a, DEFAULT_FONT, white);
+            render_answer(renderer, ans_a_x, ans_a_y, "A:", DEFAULT_FONT, orange);
+        }
+        if (game->B_available){
+            render_answer(renderer, ans_b_x+25, ans_b_y, current_q.ans_b, DEFAULT_FONT, white);
+            render_answer(renderer, ans_b_x, ans_b_y, "B:", DEFAULT_FONT, orange);
+        }
+        if (game->C_available){   
+            render_answer(renderer, ans_c_x+25, ans_c_y, current_q.ans_c, DEFAULT_FONT, white);
+            render_answer(renderer, ans_c_x, ans_c_y, "C:", DEFAULT_FONT, orange);
+        }
+        if (game->D_available){
+            render_answer(renderer, ans_d_x+25, ans_d_y, current_q.ans_d, DEFAULT_FONT, white);
+            render_answer(renderer, ans_d_x, ans_d_y, "D:", DEFAULT_FONT, orange);
+        }
+    
     }
 }
 
@@ -549,7 +569,7 @@ void render_game(SDL_Renderer* renderer, game_t* game, int* animate, int* walk_a
 
         case GAME_OVER_STATE:
             render_game_over_state(renderer,game,walk_away);
-            render_answer(renderer, 440, 455, "Press any key to continue", DEFAULT_FONT);
+            render_answer(renderer, 440, 455, "Press any key to continue", DEFAULT_FONT, white);
             //render_screen(renderer,"resources/surprise.png");
             break;        
 
@@ -570,10 +590,10 @@ int m_ans_d_y = 376;
 
 void render_opts(SDL_Renderer* renderer, menu_t* menu){
     m_question current_q = menu->question[menu->type];
-    render_answer(renderer, m_ans_a_x, m_ans_a_y, current_q.m_ans_a, DEFAULT_FONT);
-    render_answer(renderer, m_ans_b_x, m_ans_b_y, current_q.m_ans_b, DEFAULT_FONT);
-    render_answer(renderer, m_ans_c_x, m_ans_c_y, current_q.m_ans_c, DEFAULT_FONT);
-    render_answer(renderer, m_ans_d_x, m_ans_d_y, current_q.m_ans_d, DEFAULT_FONT);
+    render_answer(renderer, m_ans_a_x, m_ans_a_y, current_q.m_ans_a, DEFAULT_FONT, white);
+    render_answer(renderer, m_ans_b_x, m_ans_b_y, current_q.m_ans_b, DEFAULT_FONT, white);
+    render_answer(renderer, m_ans_c_x, m_ans_c_y, current_q.m_ans_c, DEFAULT_FONT, white);
+    render_answer(renderer, m_ans_d_x, m_ans_d_y, current_q.m_ans_d, DEFAULT_FONT, white);
 }
 
 const SDL_Rect m_rect_a = { .x = 0, .y = 270, .w = 320, .h = 90};
@@ -605,12 +625,14 @@ switch(menu->selection){
     render_screen(renderer, MENU_BG);
     render_money(renderer, 10, 5, menu->user_id, DEFAULT_FONT);
     if (menu->type == ADMIN_MENU)
-        render_answer(renderer, 440, 455, "Press R for admin options", DEFAULT_FONT);
+        render_answer(renderer, 440, 455, "Press F for admin options", DEFAULT_FONT, white);
+    if (menu->type == INIT_MENU)
+        render_answer(renderer, 5, 453, "By Saad El Jebbari & Dalia El Aiche", DEFAULT_FONT, white);
     render_opts(renderer, menu);
 }
 
 void render_stats(SDL_Renderer* renderer, stats* global_stats){
-    render_answer(renderer, 450, 455, "Press any key to go back", DEFAULT_FONT);
+    render_answer(renderer, 450, 455, "Press any key to go back", DEFAULT_FONT, white);
     FILE* stat_file = fopen("records/stats", "r");
     char top_score[20];
     char top_score_holder[20];
@@ -671,7 +693,7 @@ void render_text_input(SDL_Renderer* renderer, char* text, char* hidden, int lev
         render_25(renderer, 150, 270, "O", DEFAULT_FONT);
         render_25(renderer, 470, 270, "O", DEFAULT_FONT);
     }
-    render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT);
+    render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT, white);
 
 }
 
@@ -691,6 +713,6 @@ void render_confirm_input(SDL_Renderer* renderer, char* text, char* confirm, int
         render_25(renderer, 150, 270, "O", DEFAULT_FONT);
         render_25(renderer, 470, 270, "O", DEFAULT_FONT);
     }
-    render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT);
+    render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT, white);
 
 }

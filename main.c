@@ -101,23 +101,23 @@ int main(int argc, char *argv[])
                 break;
             case SDL_KEYDOWN:
                 switch (e.key.keysym.scancode){
-                case SDL_SCANCODE_A:
+                case SDL_SCANCODE_Q:
                      if (menu.selection < 5)
                         menu.selection = A_SELECTED;
                     break;
-                case SDL_SCANCODE_B:
+                case SDL_SCANCODE_W:
                      if (menu.selection < 5)    
                         menu.selection = B_SELECTED;
                     break;
-                case SDL_SCANCODE_C:
+                case SDL_SCANCODE_E:
                      if (menu.selection < 5)    
                         menu.selection = C_SELECTED;
                     break;
-                case SDL_SCANCODE_D:
+                case SDL_SCANCODE_R:
                      if (menu.selection < 5)    
                         menu.selection = D_SELECTED;
                     break;
-                case SDL_SCANCODE_R:
+                case SDL_SCANCODE_F:
                     // Admin ops menu
                     if (menu.type == ADMIN_MENU){
                         menu.type = ADMIN_OPS;
