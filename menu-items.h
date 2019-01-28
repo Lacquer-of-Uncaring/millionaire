@@ -6,5 +6,6 @@ void username_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd
 void signup_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd);
 void admin_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* confirm);
 void rights_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* confirm);
+void add_question_input(SDL_Renderer* renderer, menu_t* menu, question* new_q);
 
 #endif // MENU_ITEMS_H_

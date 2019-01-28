@@ -126,7 +126,7 @@ void passwd_input(SDL_Renderer* renderer, menu_t* menu, user_t* username, char* 
                 case SDL_KEYDOWN:
                     switch (e.key.keysym.scancode){ 
                     case SDL_SCANCODE_ESCAPE:
-                        //passwd = calloc(1,21);
+                        //passwd = calloc(1,31);
                         passwd[0] = 0;
                         done = 1;
                         break;
@@ -278,12 +278,12 @@ void username_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* passwd
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
                 case SDL_QUIT:
-                    /* Quit */
+                    // Quit 
                     done = 1;
                     menu->state = QUIT;
                     break;
                 case SDL_TEXTINPUT:
-                    /* Add new id onto the end of our id */
+                    // Add new id onto the end of our id 
                     if (strlen(id) < 20)
                         strcat(id, e.text.text);
                     break;
@@ -648,6 +648,127 @@ void rights_input(SDL_Renderer* renderer, menu_t* menu, char* id, char* confirm)
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         render_confirm_input(renderer,id,confirm,level);
+        SDL_RenderPresent(renderer);
+    
+        SDL_Delay(1000/60);
+    }
+    menu->selection = NO_SELECTION;
+}
+
+void add_question_input(SDL_Renderer* renderer, menu_t* menu, question* new_q){
+    int done = 0;
+    int level = 0;
+    int success = 0;
+    SDL_StartTextInput();
+    while (!done && !success) {
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            switch (e.type) {
+                case SDL_QUIT:
+                    // Quit 
+                    if (level == 0){
+                        done = 1;
+                        menu->state = QUIT;
+                    } else {
+                        level--;
+                    }
+                    break;
+                case SDL_TEXTINPUT:
+                    // Add new id onto the end of our id 
+                    switch(level){
+                        case 0:
+                        if (strlen(new_q->text) < 150)
+                            strcat(new_q->text, e.text.text);
+                        break;
+                        case 1:
+                        if (strlen(new_q->ans_a) < 30)
+                            strcat(new_q->ans_a, e.text.text);
+                        break;
+                        case 2:
+                        if (strlen(new_q->ans_b) < 30)
+                            strcat(new_q->ans_b, e.text.text);
+                        break;
+                        case 3:
+                        if (strlen(new_q->ans_c) < 30)
+                            strcat(new_q->ans_c, e.text.text);
+                        break;
+                        case 4:
+                        if (strlen(new_q->ans_d) < 30)
+                            strcat(new_q->ans_d, e.text.text);
+                        break;
+                    }
+                    break;
+                case SDL_KEYDOWN:
+                switch (e.key.keysym.scancode){ 
+                    case SDL_SCANCODE_ESCAPE:
+                    switch(level){
+                        case 0:
+                        if (strlen(new_q->text) < 150)
+                            new_q->text = calloc(1,151);
+                        break;
+                        case 1:
+                        if (strlen(new_q->ans_a) < 30)
+                            new_q->ans_a = calloc(1,31);
+                        break;
+                        case 2:
+                        if (strlen(new_q->ans_b) < 30)
+                            new_q->ans_b = calloc(1,31);
+                        break;
+                        case 3:
+                        if (strlen(new_q->ans_c) < 30)
+                            new_q->ans_c = calloc(1,31);
+                        break;
+                        case 4:
+                        if (strlen(new_q->ans_d) < 30)
+                            new_q->ans_d = calloc(1,31);
+                        break;
+                    }
+                    if (level == 0){
+                        done = 1;
+                        menu->selection = NO_SELECTION;
+                    } else {
+                        level--;
+                    }
+                    break;
+                    case SDL_SCANCODE_BACKSPACE:
+                    switch(level){
+                        case 0:
+                        if (strlen(new_q->text) < 150)
+                            new_q->text[strlen(new_q->text)-1] = 0;
+                        break;
+                        case 1:
+                        if (strlen(new_q->ans_a) < 30)
+                            new_q->ans_a[strlen(new_q->ans_a)-1] = 0;
+                        break;
+                        case 2:
+                        if (strlen(new_q->ans_b) < 30)
+                            new_q->ans_b[strlen(new_q->ans_b)-1] = 0;
+                        break;
+                        case 3:
+                        if (strlen(new_q->ans_c) < 30)
+                            new_q->ans_c[strlen(new_q->ans_c)-1] = 0;
+                        break;
+                        case 4:
+                        if (strlen(new_q->ans_d) < 30)
+                            new_q->ans_d[strlen(new_q->ans_d)-1] = 0;
+                        break;
+                    }
+                    break;
+                    case SDL_SCANCODE_RETURN:
+                    if (level < 4){
+                        level++;
+                    } else {
+                        menu->selection = NO_SELECTION;
+                        success = 1;
+                        done = 1;
+                    }
+                    break;
+                }
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        render_question_input(renderer,new_q,level);
         SDL_RenderPresent(renderer);
     
         SDL_Delay(1000/60);

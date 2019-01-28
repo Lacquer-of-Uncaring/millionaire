@@ -222,7 +222,7 @@ void decrement_user_number(){
 }
 
 
-int count_lines(FILE* fp){
+int count_questions(FILE* fp){
   int lines=0;
   int ch = 0;
   while(!feof(fp)){
@@ -236,11 +236,12 @@ int count_lines(FILE* fp){
 
 int* random_different_numbers(const char* path){
     FILE* fp = fopen(path,"r");
-    int n = count_lines(fp);
+    int n = count_questions(fp);
     fclose(fp);
     int array[n];
     count(array,n);
     shuffle(array,n);
+    // We only need 6 questions for each diff so we only return the first 6 random numbers
     int* ret = malloc(6*sizeof(int));
     for (int i=0; i<6; i++)
         ret[i] = array[i];
@@ -678,13 +679,23 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
     game->score = 0;
     game->top_score = global_stats->top_score;
     game->top_score_changed = 0;
-            // This is only fast because it returns the same game everytime and so it stays in cache 
-            //can maybe be moved to before the menu loop and after every gameover state                
+
     char* id = calloc(1,21); 
     char* passwd = calloc(1,21);
     char* confirm = calloc(1,21);
-    switch (menu->type){  
+    char* text = calloc(1,151);
+    char* ans_a = calloc(1,31);
+    char* ans_b = calloc(1,31);
+    char* ans_c = calloc(1,31);
+    char* ans_d = calloc(1,31);
+    question* new_q = malloc(sizeof(question));
+    new_q->text = text;
+    new_q->ans_a = ans_a;
+    new_q->ans_b = ans_b;
+    new_q->ans_c = ans_c;
+    new_q->ans_d = ans_d;
 
+    switch (menu->type){  
         case INIT_MENU:
         switch (menu->selection){
             case A_CONFIRMED: // Login
@@ -784,7 +795,7 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
                 rights_input(renderer,menu,id,confirm);
                 break;
             case C_CONFIRMED: // Add a question
-                // TODO
+                add_question_input(renderer,menu,new_q);
                 break;
             case D_CONFIRMED: // Go Back
                 menu->type = ADMIN_MENU;

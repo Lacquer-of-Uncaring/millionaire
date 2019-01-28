@@ -499,7 +499,7 @@ void render_running_state(SDL_Renderer* renderer, game_t* game, int* animate){
     render_lifeline_25(renderer,game);
     render_lifeline_switch(renderer,game);
     if (*animate){
-        SDL_RenderPresent(renderer);
+        //SDL_RenderPresent(renderer);
     }
     render_text(renderer,game,animate);    
 }
@@ -715,4 +715,21 @@ void render_confirm_input(SDL_Renderer* renderer, char* text, char* confirm, int
     }
     render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT, white);
 
+}
+
+void render_question_input(SDL_Renderer* renderer, question* new_q, int level){
+    render_answer(renderer, ans_a_x+25, ans_a_y, new_q->ans_a, DEFAULT_FONT, white);
+    render_answer(renderer, ans_a_x, ans_a_y, "A:", DEFAULT_FONT, orange);
+
+    render_answer(renderer, ans_b_x+25, ans_b_y, new_q->ans_b, DEFAULT_FONT, white);
+    render_answer(renderer, ans_b_x, ans_b_y, "B:", DEFAULT_FONT, orange);
+
+    render_answer(renderer, ans_c_x+25, ans_c_y, new_q->ans_c, DEFAULT_FONT, white);
+    render_answer(renderer, ans_c_x, ans_c_y, "C:", DEFAULT_FONT, orange);
+
+    render_answer(renderer, ans_d_x+25, ans_d_y, new_q->ans_d, DEFAULT_FONT, white);   
+    render_answer(renderer, ans_d_x, ans_d_y, "D:", DEFAULT_FONT, orange);
+        
+    render_screen(renderer, RUNNING_BG);
+    render_question(renderer, question_x, question_y, new_q->text, DEFAULT_FONT);
 }
