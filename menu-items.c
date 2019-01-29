@@ -105,6 +105,16 @@ void record_users(node* head){
     fclose(user_file);
 }
 
+void record_question(question* new_q, const char* path){
+    FILE* fp = fopen(path,"a");
+    fprintf(fp,"\n%s\n%s\n%s\n%s\n%s",new_q->text,
+                                      new_q->ans_a,
+                                      new_q->ans_b,
+                                      new_q->ans_c,
+                                      new_q->ans_d);
+    fclose(fp);
+}
+
 void passwd_input(SDL_Renderer* renderer, menu_t* menu, user_t* username, char* id, char* passwd, int* success){
     int done = 0;
     int level = 1;
@@ -666,12 +676,8 @@ void add_question_input(SDL_Renderer* renderer, menu_t* menu, question* new_q){
             switch (e.type) {
                 case SDL_QUIT:
                     // Quit 
-                    if (level == 0){
-                        done = 1;
-                        menu->state = QUIT;
-                    } else {
-                        level--;
-                    }
+                    done = 1;
+                    menu->state = QUIT;
                     break;
                 case SDL_TEXTINPUT:
                     // Add new id onto the end of our id 
@@ -703,24 +709,19 @@ void add_question_input(SDL_Renderer* renderer, menu_t* menu, question* new_q){
                     case SDL_SCANCODE_ESCAPE:
                     switch(level){
                         case 0:
-                        if (strlen(new_q->text) < 150)
-                            new_q->text = calloc(1,151);
+                        new_q->text = calloc(1,151);
                         break;
                         case 1:
-                        if (strlen(new_q->ans_a) < 30)
-                            new_q->ans_a = calloc(1,31);
+                        new_q->ans_a = calloc(1,31);
                         break;
                         case 2:
-                        if (strlen(new_q->ans_b) < 30)
-                            new_q->ans_b = calloc(1,31);
+                        new_q->ans_b = calloc(1,31);
                         break;
                         case 3:
-                        if (strlen(new_q->ans_c) < 30)
-                            new_q->ans_c = calloc(1,31);
+                        new_q->ans_c = calloc(1,31);
                         break;
                         case 4:
-                        if (strlen(new_q->ans_d) < 30)
-                            new_q->ans_d = calloc(1,31);
+                        new_q->ans_d = calloc(1,31);
                         break;
                     }
                     if (level == 0){
@@ -733,42 +734,81 @@ void add_question_input(SDL_Renderer* renderer, menu_t* menu, question* new_q){
                     case SDL_SCANCODE_BACKSPACE:
                     switch(level){
                         case 0:
-                        if (strlen(new_q->text) < 150)
-                            new_q->text[strlen(new_q->text)-1] = 0;
+                        new_q->text[strlen(new_q->text)-1] = 0;
                         break;
                         case 1:
-                        if (strlen(new_q->ans_a) < 30)
-                            new_q->ans_a[strlen(new_q->ans_a)-1] = 0;
+                        new_q->ans_a[strlen(new_q->ans_a)-1] = 0;
                         break;
                         case 2:
-                        if (strlen(new_q->ans_b) < 30)
-                            new_q->ans_b[strlen(new_q->ans_b)-1] = 0;
+                        new_q->ans_b[strlen(new_q->ans_b)-1] = 0;
                         break;
                         case 3:
-                        if (strlen(new_q->ans_c) < 30)
-                            new_q->ans_c[strlen(new_q->ans_c)-1] = 0;
+                        new_q->ans_c[strlen(new_q->ans_c)-1] = 0;
                         break;
                         case 4:
-                        if (strlen(new_q->ans_d) < 30)
-                            new_q->ans_d[strlen(new_q->ans_d)-1] = 0;
+                        new_q->ans_d[strlen(new_q->ans_d)-1] = 0;
                         break;
                     }
                     break;
                     case SDL_SCANCODE_RETURN:
-                    if (level < 4){
-                        level++;
-                    } else {
+                    switch(level){
+                        case 0:
+                        if (strlen(new_q->text) != 0)
+                            level++;
+                        break;
+                        case 1:
+                        if (strlen(new_q->ans_a) != 0)
+                            level++;
+                        break;
+                        case 2:
+                        if (strlen(new_q->ans_b) != 0)
+                            level++;
+                        break;
+                        case 3:
+                        if (strlen(new_q->ans_c) != 0)
+                            level++;
+                        break;
+                        case 4:
+                        if (strlen(new_q->ans_d) != 0)
+                            level++;
+                        break;
+                    }
+                    break;
+                    case SDL_SCANCODE_1:
+                    if (level == 5){
+                        record_question(new_q,"records/lvl1");
                         menu->selection = NO_SELECTION;
                         success = 1;
                         done = 1;
                     }
+                    break;
+                    case SDL_SCANCODE_2:
+                    if (level == 5){
+                        record_question(new_q,"records/lvl2");
+                        menu->selection = NO_SELECTION;
+                        success = 1;
+                        done = 1;
+                    }
+                    break;
+                    case SDL_SCANCODE_3:
+                    if (level == 5){
+                        record_question(new_q,"records/lvl3");
+                        menu->selection = NO_SELECTION;
+                        success = 1;
+                        done = 1;
+                    }
+                        
+                    
                     break;
                 }
             }
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        render_question_input(renderer,new_q,level);
+        if (level < 5)
+            render_question_input(renderer,new_q,level);
+        else
+            render_question(renderer,128,200,"Rate the difficulty of the question by pressing 1, 2, or 3 on your keyboard", DEFAULT_FONT);
         SDL_RenderPresent(renderer);
     
         SDL_Delay(1000/60);

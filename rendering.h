@@ -38,5 +38,6 @@ void render_text_input(SDL_Renderer* renderer, char* text, char* hidden, int lev
 void render_answer(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name, const SDL_Color color);
 void render_confirm_input(SDL_Renderer* renderer, char* text, char* confirm, int level);
 void render_question_input(SDL_Renderer* renderer, question* new_q, int level);
+void render_question(SDL_Renderer* renderer, int x, int y, const char* text, const char* font_name);
 
 #endif  // RENDERING_H_

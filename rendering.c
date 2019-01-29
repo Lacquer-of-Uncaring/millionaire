@@ -732,4 +732,7 @@ void render_question_input(SDL_Renderer* renderer, question* new_q, int level){
         
     render_screen(renderer, RUNNING_BG);
     render_question(renderer, question_x, question_y, new_q->text, DEFAULT_FONT);
+
+    render_20(renderer, 35, 280, "Be careful! Answer A will be taken as the correct one", DEFAULT_FONT);
+    render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT, white);
 }
