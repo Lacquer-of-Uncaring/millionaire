@@ -543,9 +543,24 @@ void decrement_timer(game_t* game, int* init){
 int random_wrong_answer(game_t* game){
     question current_q = game->questions[game->question_number-1];
     int r;
+    int available;
     do{
         r = rand() % 4;
-    } while (r == current_q.correct - 5);
+        switch(r){
+            case 0:
+            available = game->A_available;
+            break;
+            case 1:
+            available = game->B_available;
+            break;
+            case 2:
+            available = game->C_available;
+            break;
+            case 3:
+            available = game->D_available;
+            break;
+        }
+    } while (r == current_q.correct - 5 || !available);
     
     return r;
 }
