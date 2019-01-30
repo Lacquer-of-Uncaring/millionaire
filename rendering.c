@@ -736,3 +736,10 @@ void render_question_input(SDL_Renderer* renderer, question* new_q, int level){
     render_20(renderer, 35, 280, "Be careful! Answer A will be taken as the correct one", DEFAULT_FONT);
     render_answer(renderer, 355, 455, "Press Enter to confirm and ESC to go back", DEFAULT_FONT, white);
 }
+
+void render_instructions(SDL_Renderer* renderer){
+    render_screen(renderer,"resources/instructs.png");
+    render_20(renderer, 75, 130, "50           25      switch", DEFAULT_FONT);
+    render_20(renderer, 120, 310, "A             B             C             D", DEFAULT_FONT); 
+    render_20(renderer, 450, 260, "confirm", DEFAULT_FONT);    
+}

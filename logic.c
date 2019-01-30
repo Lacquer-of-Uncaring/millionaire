@@ -295,8 +295,8 @@ question* scramble_answers(question* org){
   ret->ans_b = malloc(30);
   ret->ans_c = malloc(30);
   ret->ans_d = malloc(30);
-  ret->text = org->text;
-  for (int i=0; i<4; i++){
+  ret->text = org->text
+;  for (int i=0; i<4; i++){
     switch (i){
       case 0:
         switch (trans[i]){
@@ -720,7 +720,15 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
                 signup_input(renderer,menu,id,passwd);
                 break;
             case C_CONFIRMED: // Show instructions
-                // TODO
+                SDL_RenderClear(renderer);
+                render_instructions(renderer);
+                SDL_RenderPresent(renderer);
+                SDL_Event o;
+                do{
+                    SDL_WaitEvent(&o);
+                } while(o.type != SDL_KEYDOWN && o.type != SDL_MOUSEBUTTONDOWN);
+                menu->state = RUNNING;
+                menu->selection = NO_SELECTION;
                 break;
             case D_CONFIRMED: // Show stats
                 SDL_RenderClear(renderer);
@@ -751,7 +759,15 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
                 menu->selection = NO_SELECTION;
                 break;
             case C_CONFIRMED: // Show instructions
-                // TODO
+                SDL_RenderClear(renderer);
+                render_instructions(renderer);
+                SDL_RenderPresent(renderer);
+                SDL_Event o;
+                do{
+                    SDL_WaitEvent(&o);
+                } while(o.type != SDL_KEYDOWN && o.type != SDL_MOUSEBUTTONDOWN);
+                menu->state = RUNNING;
+                menu->selection = NO_SELECTION;
                 break;
             case D_CONFIRMED: // Show stats
                 SDL_RenderClear(renderer);
@@ -783,7 +799,15 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
                 menu->selection = NO_SELECTION;
                 break;
             case C_CONFIRMED: // Show instructions
-                // TODO
+                SDL_RenderClear(renderer);
+                render_instructions(renderer);
+                SDL_RenderPresent(renderer);
+                SDL_Event o;
+                do{
+                    SDL_WaitEvent(&o);
+                } while(o.type != SDL_KEYDOWN && o.type != SDL_MOUSEBUTTONDOWN);
+                menu->state = RUNNING;
+                menu->selection = NO_SELECTION;
                 break;
             case D_CONFIRMED: // Show stats
                 SDL_RenderClear(renderer);
