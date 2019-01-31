@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     char* grant = "TOGGLE ADMIN";
     char* add = "ADD QUESTION";
     char* back = "BACK";
-
+    
     m_question init_menu = {
         .m_ans_a = login,
         .m_ans_b = singup,
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
     game_t* game = game_init(&menu);;
     int x, y;
-
+    // Main menu animation loop
     SDL_Event e;
     while (menu.state != QUIT) {
         while (SDL_PollEvent(&e)) {
@@ -160,9 +160,6 @@ int main(int argc, char *argv[])
         SDL_FlushEvent(SDL_MOUSEBUTTONDOWN);
         SDL_FlushEvent(SDL_MOUSEMOTION);
     }    
-    //game_t* game = game_init();
-    //game_loop(renderer, game);
-
     SDL_DestroyWindow(window);
     SDL_Quit();
 

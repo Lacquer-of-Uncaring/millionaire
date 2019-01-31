@@ -23,6 +23,7 @@ int box_d_y = 395;
 int box_w = 215;
 int box_h = 55;
 
+// Shuffling an array of size n
 void shuffle(int *array, size_t n){
     if (n > 1){
         size_t i;
@@ -36,13 +37,14 @@ void shuffle(int *array, size_t n){
     }
 }
 
+// Fills an array with counting numbers
 void count(int *array, int n){
     for (int i = 0; i < n; i++){
         array[i] = i+1;
     }
 }
 
-
+// Checks the currently confirmed answer
 int check_answer(game_t *game){
     question current_q = game->questions[game->question_number-1];
     if (current_q.correct == game->selection)
@@ -50,6 +52,7 @@ int check_answer(game_t *game){
     return 0;
 }
 
+// Returns the game score
 int game_score(game_t* game, int* walk_away){
     if (*walk_away){    
         switch (game->question_number) {
@@ -131,6 +134,7 @@ int game_score(game_t* game, int* walk_away){
     }
 }
 
+// Returns a pointer to stats fetched from the records file
 stats* fetch_stats(){
     stats* global_stats = malloc(sizeof(stats));
     FILE* stat_file = fopen("records/stats", "r");
@@ -162,26 +166,27 @@ stats* fetch_stats(){
     return global_stats;
 }
 
+// Updates the stats file
 void record_game_stats(game_t* game){
     stats* global_stats = fetch_stats();
-    
+    // Changes the top score if it has changed
     if (game->top_score_changed){
         global_stats->top_score = game->top_score;
         strcpy(global_stats->top_score_holder, game->player_id);
     }
-
+    // Updates the number of correct answer
     if (game->question_number < 15 || (game->question_number == 15 && !check_answer(game)))
         global_stats->correct_answers += game->question_number-1;
-    else 
+    else
         global_stats->correct_answers += game->question_number; // += 15
-
+    // Update lifeline uses
     if (!game->lifeline_50)
         global_stats->lifeline_50_uses++;
     if (!game->lifeline_25)
         global_stats->lifeline_25_uses++;
     if (!game->lifeline_switch)
         global_stats->lifeline_switch_uses++;
-
+    // Write everything to the file
     FILE* stat_file = fopen("records/stats", "w");
     fprintf(stat_file,"%d %s %d %d %d %d %d",global_stats->top_score
                                             ,global_stats->top_score_holder
@@ -193,6 +198,7 @@ void record_game_stats(game_t* game){
     fclose(stat_file);
 }
 
+// Used when accounts are created or deleted
 void increment_user_number(){
     stats* global_stats = fetch_stats();
     global_stats->number_of_users++;
@@ -221,7 +227,7 @@ void decrement_user_number(){
     fclose(stat_file);
 }
 
-
+// Counts the number of questions in a file
 int count_questions(FILE* fp){
   int lines=0;
   int ch = 0;
@@ -234,6 +240,7 @@ int count_questions(FILE* fp){
   return lines/5;
 }
 
+// Retruns an array of 6 random different numbers between 1 and the number of questions in a file
 int* random_different_numbers(const char* path){
     FILE* fp = fopen(path,"r");
     int n = count_questions(fp);
@@ -242,12 +249,13 @@ int* random_different_numbers(const char* path){
     count(array,n);
     shuffle(array,n);
     // We only need 6 questions for each diff so we only return the first 6 random numbers
-    int* ret = malloc(6*sizeof(int));
+    int* ret = calloc(6,sizeof(int));
     for (int i=0; i<6; i++)
         ret[i] = array[i];
     return ret;
 }
 
+// Returns the nth question from a specified file
 question* nth_question(int n, const char* path){
     FILE* fp = fopen(path,"r");
     question* ret = malloc(sizeof(question));
@@ -285,6 +293,7 @@ question* nth_question(int n, const char* path){
         free(line);
 }
 
+// Shuffles the order of the answers (A is supposed the correct answer in org)
 question* scramble_answers(question* org){
   int trans[4] = {0,1,2,3};
   srand( time(0)+clock()+rand() );
@@ -375,13 +384,15 @@ question* scramble_answers(question* org){
   }
 }
 
+// Initialises a new game
 game_t* game_init(menu_t* menu){
 
-
+    // Seeding rand for the function calls
     srand( time(0)+clock()+rand() );
     question* org;
     question* ret;
     game_t* game = malloc(sizeof(game_t));
+    // Getting 5 random questions of diff 1
     int* r1 = random_different_numbers("records/lvl1");
     for (int i=0; i<5; i++){
         org = nth_question(r1[i],"records/lvl1");
@@ -390,6 +401,7 @@ game_t* game_init(menu_t* menu){
         free(org);
         free(ret);
     }
+    // Extra diff 1 question for switch
     org = nth_question(r1[5],"records/lvl1");
     ret = scramble_answers(org);
     game->switch_questions[0] = *ret;
@@ -426,7 +438,7 @@ game_t* game_init(menu_t* menu){
     free(r1);
     free(r2);
     free(r3);
-
+    // Resetting the game_t fields
     stats* global_stats = fetch_stats();
     strcpy(game->player_id, menu->user_id);
     game->selection = NO_SELECTION;
@@ -447,6 +459,7 @@ game_t* game_init(menu_t* menu){
     return game;   
 } 
 
+// Confirming selected answer
 void answer_confirm(game_t *game){
     if (game->state == RUNNING_STATE){
         if (game->selection < 5 && game->selection > 0)
@@ -454,6 +467,7 @@ void answer_confirm(game_t *game){
     }
 }
 
+// Resets the game state for the next question
 void next_question(game_t* game, int* animate){
     game->question_number += 1;
     game->selection = NO_SELECTION;
@@ -471,6 +485,7 @@ void next_question(game_t* game, int* animate){
     *animate = 1;
 }
 
+// Checks if the game should end
 void check_game_over_state(game_t *game, menu_t* menu, int* animate, int* walk_away){
     // Go back to menu when a key or a mouse button is pressed
     if (game->state == GAME_OVER_STATE){
@@ -480,7 +495,7 @@ void check_game_over_state(game_t *game, menu_t* menu, int* animate, int* walk_a
             game->top_score = game->score;
             game->top_score_changed = 1;
         }
-
+        // Wait for user input to continue
         SDL_Event e;
         do{
             SDL_WaitEvent(&e);
@@ -513,6 +528,7 @@ void check_game_over_state(game_t *game, menu_t* menu, int* animate, int* walk_a
     }     
 }   
 
+// Mouse hover detection
 void hover_select(game_t* game, int x, int y){
     if (game->state == RUNNING_STATE){
         if (game->selection < 5){
@@ -529,6 +545,8 @@ void hover_select(game_t* game, int x, int y){
     }
 
 }
+
+// Updates the countdown on the current question
 void decrement_timer(game_t* game, int* init){
     int current = SDL_GetTicks();
     // Decrement the countdown timer every second
@@ -540,6 +558,7 @@ void decrement_timer(game_t* game, int* init){
     }
 }
 
+// Returns a random wrong answer to delete
 int random_wrong_answer(game_t* game){
     question current_q = game->questions[game->question_number-1];
     int r;
@@ -565,6 +584,7 @@ int random_wrong_answer(game_t* game){
     return r;
 }
 
+// Makes anwer unselectable
 int delete_wrong_answer(game_t* game){
     int r = random_wrong_answer(game);
     switch (r){
@@ -586,6 +606,7 @@ int delete_wrong_answer(game_t* game){
     return r;
 }
 
+// Deletes two wrong answers
 void use_lifeline_50(game_t* game){
     if (game->state == RUNNING_STATE){    
         if (game->selection < 5){
@@ -602,6 +623,7 @@ void use_lifeline_50(game_t* game){
     }
 }
 
+// Deletes one wrong answer
 void use_lifeline_25(game_t* game){
     if (game->state == RUNNING_STATE){    
         if (game->selection < 5){
@@ -614,6 +636,7 @@ void use_lifeline_25(game_t* game){
     }
 }
 
+// Changes the current question to the switch question
 void use_lifeline_switch(game_t* game, int* animate){
     if (game->lifeline_switch && game->state == RUNNING_STATE && game->selection < 5){
         question *current_q = &game->questions[game->question_number-1];
@@ -635,7 +658,7 @@ void use_lifeline_switch(game_t* game, int* animate){
         current_q->ans_d = malloc(strlen(switch_q->ans_d) + 1);
         strcpy(current_q->ans_d,switch_q->ans_d);
         current_q->correct = switch_q->correct;
-        // reset the question
+        // reset the game state for a new question
         game->lifeline_switch = 0;
         game->selection = NO_SELECTION;
         game->A_available = 1;
@@ -666,6 +689,7 @@ int m_box_d_y = 365;
 int m_box_w = 215;
 int m_box_h = 55;
 
+// Mouse hover detection
 void menu_hover_select(menu_t* menu, int x, int y){
     menu->selection = NO_SELECTION;        
     if (x > m_box_a_x && x < m_box_a_x + m_box_w && y > m_box_a_y && y < m_box_a_y + m_box_h)
@@ -678,8 +702,9 @@ void menu_hover_select(menu_t* menu, int x, int y){
         menu->selection = D_SELECTED;
 }
 
-
+// Main Menu
 void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
+    // Resetting the game without the questions before the start button is pressed so it's responsive
     stats* global_stats = fetch_stats();
     game->selection = NO_SELECTION;
     game->A_available = 1;
@@ -694,7 +719,7 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
     game->score = 0;
     game->top_score = global_stats->top_score;
     game->top_score_changed = 0;
-
+    // Variables for text input
     char* id = calloc(1,21); 
     char* passwd = calloc(1,21);
     char* confirm = calloc(1,21);
@@ -709,7 +734,7 @@ void check_menu_selection(SDL_Renderer* renderer,game_t* game, menu_t* menu){
     new_q->ans_b = ans_b;
     new_q->ans_c = ans_c;
     new_q->ans_d = ans_d;
-
+    // Menu Buttons
     switch (menu->type){  
         case INIT_MENU:
         switch (menu->selection){
